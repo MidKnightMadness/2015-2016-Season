@@ -19,7 +19,7 @@ Thumbs.db
 .DS_Store
 
 # Android Studio
-/*.iml
+/**/*.iml
 /.idea
 /.gradle
 /build
