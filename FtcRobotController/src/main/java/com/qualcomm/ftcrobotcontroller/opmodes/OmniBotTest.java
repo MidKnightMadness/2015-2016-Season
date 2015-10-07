@@ -20,12 +20,17 @@ public class OmniBotTest extends OpMode {
 
     @Override
     public void loop() {
-        double[] motorPwr = calculateMotorValues(gamepad1.left_stick_x, gamepad1.left_stick_y);
+        double[] motorPwr = calculateMotorValues(gamepad1.left_stick_x, gamepad1.left_stick_y,
+                gamepad1.right_stick_x, gamepad1.right_stick_y);
         front_left.setPower(motorPwr[0]);
         front_right.setPower(motorPwr[1]);
         back_left.setPower(motorPwr[2]);
         back_right.setPower(motorPwr[3]);
         // TODO: Maybe have one stick = omnidirectional & 2 sticks be tank-like
+        telemetry.addData("right_stick_x", gamepad1.right_stick_x);
+        telemetry.addData("right_stick_y", gamepad1.right_stick_y);
+        telemetry.addData("left_stick_x", gamepad1.left_stick_x);
+        telemetry.addData("left_stick_y", gamepad1.left_stick_y);
         telemetry.addData("front_left power", front_left.getPower());
         telemetry.addData("front_right_power", front_right.getPower());
         telemetry.addData("back_left_power", back_left.getPower());
@@ -36,22 +41,25 @@ public class OmniBotTest extends OpMode {
     /**
      * Calculates the motor powers for driving omnidirectionally <b>USING A SINGLE JOYSTICK</b>
      *
-     * @param joyX The left X-value of the joystick
-     * @param joyY The left Y-value of the joystick
+     * @param joyLX The left X-value of the joystick
+     * @param joyLY The left Y-value of the joystick
      * @return A float array with the motor powers in the following order: front_left, front_right, back_left, back_right
      */
-    private double[] calculateMotorValues(float joyX, float joyY) {
+    private double[] calculateMotorValues(float joyLX, float joyLY, float joyRX, float joyRY) {
         double[] motorPower = new double[]{0, 0, 0, 0};
-        joyX = scaleInput(joyX);
-        joyY = scaleInput(joyY);
+        joyLX = scaleInput(joyLX);
+        joyLY = scaleInput(joyLY);
+        joyRX = scaleInput(joyRX);
+        joyRY = scaleInput(joyRY);
+        float modX = (joyLX + joyRX) / 2;
         // front_left
-        motorPower[0] = joyX + joyY;
+        motorPower[0] = modX + joyLY;
         // front_right
-        motorPower[1] = -joyX + joyY;
+        motorPower[1] = -modX + joyLY;
         // back_left
-        motorPower[2] = -joyX + joyY;
+        motorPower[2] = -modX + joyRY;
         // back_right
-        motorPower[3] = joyX + joyY;
+        motorPower[3] = modX + joyRY;
 
         // limit range
         for (int i = 0; i < motorPower.length; i++) {
@@ -69,7 +77,7 @@ public class OmniBotTest extends OpMode {
         else if (index > 16)
             index = 16;
         float scaled;
-        if(input < 0)
+        if (input < 0)
             scaled = (float) -scaleArray[index];
         else
             scaled = (float) scaleArray[index];
