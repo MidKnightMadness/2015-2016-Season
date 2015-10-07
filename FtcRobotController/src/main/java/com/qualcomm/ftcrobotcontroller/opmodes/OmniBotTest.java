@@ -14,11 +14,13 @@ public class OmniBotTest extends OpMode {
         front_right = hardwareMap.dcMotor.get("front_right");
         back_left = hardwareMap.dcMotor.get("back_left");
         back_right = hardwareMap.dcMotor.get("back_right");
+        back_left.setDirection(DcMotor.Direction.REVERSE);
+        back_right.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
     public void loop() {
-        float[] motorPwr = calculateMotorValues(gamepad1.left_stick_x, gamepad1.left_stick_y);
+        double[] motorPwr = calculateMotorValues(gamepad1.left_stick_x, gamepad1.left_stick_y);
         front_left.setPower(motorPwr[0]);
         front_right.setPower(motorPwr[1]);
         back_left.setPower(motorPwr[2]);
@@ -38,8 +40,8 @@ public class OmniBotTest extends OpMode {
      * @param joyY The left Y-value of the joystick
      * @return A float array with the motor powers in the following order: front_left, front_right, back_left, back_right
      */
-    private float[] calculateMotorValues(float joyX, float joyY) {
-        float[] motorPower = new float[]{0, 0, 0, 0};
+    private double[] calculateMotorValues(float joyX, float joyY) {
+        double[] motorPower = new double[]{0, 0, 0, 0};
         joyX = scaleInput(joyX);
         joyY = scaleInput(joyY);
         // front_left
@@ -52,8 +54,8 @@ public class OmniBotTest extends OpMode {
         motorPower[3] = joyX + joyY;
 
         // limit range
-        for(int i = 0; i < motorPower.length; i++){
-            Range.clip(motorPower[i], -1F, 1F);
+        for (int i = 0; i < motorPower.length; i++) {
+            motorPower[i] = Range.clip(motorPower[i], -1F, 1F);
         }
         return motorPower;
     }
