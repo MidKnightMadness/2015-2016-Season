@@ -14,8 +14,8 @@ public class OmniBotTest extends OpMode {
         front_right = hardwareMap.dcMotor.get("front_right");
         back_left = hardwareMap.dcMotor.get("back_left");
         back_right = hardwareMap.dcMotor.get("back_right");
-        back_left.setDirection(DcMotor.Direction.REVERSE);
-        back_right.setDirection(DcMotor.Direction.REVERSE);
+        front_left.setDirection(DcMotor.Direction.REVERSE);
+        front_right.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
@@ -53,13 +53,13 @@ public class OmniBotTest extends OpMode {
         joyRY = scaleInput(joyRY);
         float modX = (joyLX + joyRX) / 2;
         // front_left
-        motorPower[0] = modX + joyLY;
+        motorPower[0] = -modX + joyLY;
         // front_right
-        motorPower[1] = -modX + joyLY;
+        motorPower[1] = -modX - joyRY;
         // back_left
-        motorPower[2] = -modX + joyRY;
+        motorPower[2] = -modX - joyLY;
         // back_right
-        motorPower[3] = modX + joyRY;
+        motorPower[3] = -modX + joyRY;
 
         // limit range
         for (int i = 0; i < motorPower.length; i++) {
