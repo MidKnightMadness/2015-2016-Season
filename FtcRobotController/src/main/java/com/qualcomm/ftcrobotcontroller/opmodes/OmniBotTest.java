@@ -51,15 +51,15 @@ public class OmniBotTest extends OpMode {
         joyLY = scaleInput(joyLY);
         joyRX = scaleInput(joyRX);
         joyRY = scaleInput(joyRY);
-        float modX = (joyLX + joyRX) / 2;
+        float modX = -((joyLX + joyRX) / 2);
         // front_left
-        motorPower[0] = -modX + joyLY;
+        motorPower[0] = modX + joyLY;
         // front_right
-        motorPower[1] = -modX - joyRY;
+        motorPower[1] = modX - joyRY;
         // back_left
-        motorPower[2] = -modX - joyLY;
+        motorPower[2] = modX - joyLY;
         // back_right
-        motorPower[3] = -modX + joyRY;
+        motorPower[3] = modX + joyRY;
 
         // limit range
         for (int i = 0; i < motorPower.length; i++) {
