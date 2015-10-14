@@ -47,11 +47,17 @@ public class OmniBotTest extends OpMode {
      */
     private double[] calculateMotorValues(float joyLX, float joyLY, float joyRX, float joyRY) {
         double[] motorPower = new double[]{0, 0, 0, 0};
-        joyLX = scaleInput(joyLX);
+        joyRY = scaleInput(joyRY);
         joyLY = scaleInput(joyLY);
         joyRX = scaleInput(joyRX);
-        joyRY = scaleInput(joyRY);
-        float modX = -((joyLX + joyRX) / 2);
+        joyLX = scaleInput(joyLX);
+        // Dirty hack :p TODO: Fix later
+        if(Math.abs(joyLY) > 0 && Math.abs(joyRY) > 0){
+            joyLY /= 2;
+            joyRY /= 2;
+        }
+        float modX = -(joyLX + joyRX) / 2;
+        telemetry.addData("modX: ", modX);
         // front_left
         motorPower[0] = modX + joyLY;
         // front_right
@@ -81,6 +87,6 @@ public class OmniBotTest extends OpMode {
             scaled = (float) -scaleArray[index];
         else
             scaled = (float) scaleArray[index];
-        return scaled;
+        return scaled / 2;
     }
 }
