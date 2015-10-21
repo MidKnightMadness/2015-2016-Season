@@ -20,7 +20,7 @@ public class AtlerTeleOpLesson5 extends OpMode {
 
         // reverse a motor if necessary
         // leftMotor.setDirection(DcMotor.Direction.REVERSE);
-        // rightMotor.setDirection(DcMotor.Directeion.REVERSE);
+        // rightMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
