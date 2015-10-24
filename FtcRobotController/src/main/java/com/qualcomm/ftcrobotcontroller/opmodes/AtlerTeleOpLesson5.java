@@ -9,18 +9,24 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class AtlerTeleOpLesson5 extends OpMode {
 
     // declare motors
-    DcMotor leftMotor;
-    DcMotor rightMotor;
+    DcMotor leftFrontMotor;
+    DcMotor leftBackMotor;
+    DcMotor rightFrontMotor;
+    DcMotor rightBackMotor;
 
     @Override
     public void init() {
         // initialize motors
-        leftMotor = hardwareMap.dcMotor.get("leftMotor");
-        rightMotor = hardwareMap.dcMotor.get("rightMotor");
+        leftFrontMotor = hardwareMap.dcMotor.get("leftFrontMotor");
+        leftBackMotor = hardwareMap.dcMotor.get("leftBackMotor");
+        rightFrontMotor = hardwareMap.dcMotor.get("rightFrontMotor");
+        rightBackMotor = hardwareMap.dcMotor.get("rightBackMotor");
 
         // reverse a motor if necessary
-        // leftMotor.setDirection(DcMotor.Direction.REVERSE);
-        // rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        // leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        // leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
+        // rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        // rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
@@ -30,7 +36,9 @@ public class AtlerTeleOpLesson5 extends OpMode {
         float rightY = gamepad1.right_stick_x;
 
         // set the power of the motors
-        leftMotor.setPower(leftY);
-        rightMotor.setPower(rightY);
+        leftFrontMotor.setPower(leftY);
+        leftBackMotor.setPower(leftY);
+        rightFrontMotor.setPower(rightY);
+        rightBackMotor.setPower(rightY);
     }
 }
