@@ -23,8 +23,8 @@ public class AtlerTeleOpLesson5 extends OpMode {
         rightBackMotor = hardwareMap.dcMotor.get("rightBackMotor");
 
         // reverse a motor if necessary
-        // leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
-        // leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
         // rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
         // rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
     }
@@ -32,8 +32,8 @@ public class AtlerTeleOpLesson5 extends OpMode {
     @Override
     public void loop() {
         // read values from the gamepad
-        float leftY = gamepad1.left_stick_y;
-        float rightY = gamepad1.right_stick_x;
+        float leftY = gamepad1.left_stick_y / 2;
+        float rightY = gamepad1.right_stick_y / 2;
 
         // set the power of the motors
         leftFrontMotor.setPower(leftY);
