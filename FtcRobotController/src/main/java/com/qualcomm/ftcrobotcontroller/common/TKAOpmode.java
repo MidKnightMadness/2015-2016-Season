@@ -32,13 +32,15 @@ public abstract class TKAOpmode extends OpMode {
         try {
             Field[] allFields = this.getClass().getDeclaredFields();
             for (Field f : allFields) {
-                if (f.getDeclaringClass() == DcMotor.class) {
+                f.setAccessible(true);
+                if (f.getType() == DcMotor.class) {
                     f.set(this, hardwareMap.dcMotor.get(f.getName().toLowerCase()));
-                } else if (f.getDeclaringClass() == Servo.class) {
+                } else if (f.getType() == Servo.class) {
                     f.set(this, hardwareMap.servo.get(f.getName().toLowerCase()));
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             // An error occurred. We should do something about this
         }
     }
@@ -53,7 +55,7 @@ public abstract class TKAOpmode extends OpMode {
             Field[] allFields = this.getClass().getDeclaredFields();
             for (Field f : allFields) {
 
-                if (f.getDeclaringClass() == DcMotor.class) {
+                if (f.getType() == DcMotor.class) {
                     MotorGroup mg;
                     if ((mg = f.getAnnotation(MotorGroup.class)) != null) {
                         String motorGroup = mg.value();
@@ -61,6 +63,7 @@ public abstract class TKAOpmode extends OpMode {
                         if (motors == null)
                             motors = new ArrayList<DcMotor>();
                         motors.add((DcMotor) f.get(this));
+                        this.motorGroups.put(motorGroup, motors);
                     }
                 }
             }
