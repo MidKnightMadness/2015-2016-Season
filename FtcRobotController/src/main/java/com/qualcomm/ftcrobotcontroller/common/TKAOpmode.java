@@ -92,7 +92,8 @@ public abstract class TKAOpmode extends OpMode {
      *
      * @param motorGroup The motor group to stop
      */
-    protected void stopMotorGroup(String motorGroup) {
-        runMotorGroup(motorGroup, 0);
+    protected void stopMotorGroup(String... motorGroup) {
+        for (String mG : motorGroup)
+            runMotorGroup(mG, 0);
     }
 }
