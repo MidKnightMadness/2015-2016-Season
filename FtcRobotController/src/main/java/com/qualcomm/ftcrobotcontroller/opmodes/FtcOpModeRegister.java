@@ -97,8 +97,8 @@ public class FtcOpModeRegister implements OpModeRegister {
 
     manager.register("AtlerTeleOpLesson5", AtlerTeleOpLesson5.class);
     manager.register("AtlerTouchSensorTest", AtlerTouchSensorTest.class);
+    manager.register("MotorEncoderTest", MotorEncoderTest.class);
 
-    
-    
+
   }
 }
