@@ -54,7 +54,7 @@ public abstract class TKAOpmode extends OpMode {
         try {
             Field[] allFields = this.getClass().getDeclaredFields();
             for (Field f : allFields) {
-
+                f.setAccessible(true);
                 if (f.getType() == DcMotor.class) {
                     MotorGroup mg;
                     if ((mg = f.getAnnotation(MotorGroup.class)) != null) {

@@ -24,12 +24,8 @@ public class GyroTest extends TKAOpmode {
 
     @Override
     public void initialize() {
-        front_left = this.hardwareMap.dcMotor.get("front_left");
-        front_left.setDirection(DcMotor.Direction.REVERSE);
         front_right.setDirection(DcMotor.Direction.REVERSE);
-        back_left = this.hardwareMap.dcMotor.get("back_left");
-        front_right = this.hardwareMap.dcMotor.get("front_right");
-        back_right = this.hardwareMap.dcMotor.get("back_right");
+        back_right.setDirection(DcMotor.Direction.REVERSE);
         gyroSensor = this.hardwareMap.gyroSensor.get("gyro");
         gyro = new GyroWorkerThread(gyroSensor);
         gyro.start();
@@ -41,24 +37,25 @@ public class GyroTest extends TKAOpmode {
             case 0:
                 // Turning
                 double heading = this.gyro.heading();
-                if(Math.abs(heading - 90) < 2){
+                // +- 0.125 = 15
+                // +- .25 = 32
+                // y = 136x - 2
+                if(heading >= 90 + correction(0.25)){
                     this.phase = 1;
-                    break;
+                    return;
                 }
-                front_left.setPower(0.5);
-                back_left.setPower(0.5);
-                front_right.setPower(-0.5);
-                back_right.setPower(-0.5);
+                runMotorGroup("left", 0.25);
+                runMotorGroup("right", -0.25);
                 break;
             case 1:
-                front_left.setPower(0);
-                back_left.setPower(0);
-                front_right.setPower(0);
-                back_right.setPower(0);
+                stopMotorGroup("left", "right");
                 break;
         }
         telemetry.addData("raw gyro", this.gyroSensor.getRotation());
         telemetry.addData("Heading", gyro.heading());
         telemetry.addData("phase", this.phase);
+    }
+    private double correction(double speed){
+        return (136 * Math.abs(speed)) -2;
     }
 }
