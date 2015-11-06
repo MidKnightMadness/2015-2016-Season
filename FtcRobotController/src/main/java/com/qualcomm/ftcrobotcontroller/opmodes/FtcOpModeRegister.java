@@ -61,6 +61,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("PushBotAuto", PushBotAuto.class);
     manager.register ("PushBotManual", PushBotManual.class);
     manager.register("GyroTest", GyroTest.class);
+    manager.register("CameraOp", CameraOp.class);
 
     /*
      * Uncomment any of the following lines if you want to register an op mode.

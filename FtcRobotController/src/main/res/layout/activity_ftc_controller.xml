@@ -147,5 +147,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       android:layout_marginBottom="10dp"
       android:text="" />
 
+    <FrameLayout
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/textErrorMessage"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/previewLayout">
+    </FrameLayout>
+
   </RelativeLayout>
 </LinearLayout>
