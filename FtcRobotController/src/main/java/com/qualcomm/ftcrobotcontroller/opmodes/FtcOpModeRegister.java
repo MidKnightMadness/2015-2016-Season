@@ -62,7 +62,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("PushBotManual", PushBotManual.class);
     manager.register("GyroTest", GyroTest.class);
     manager.register("CameraOp", CameraOp.class);
-
+    manager.register("TreadBot", TreadBot.class);
     /*
      * Uncomment any of the following lines if you want to register an op mode.
      */
@@ -96,7 +96,6 @@ public class FtcOpModeRegister implements OpModeRegister {
     //manager.register("PushBotIrSeek", PushBotIrSeek.class);
     //manager.register("PushBotSquare", PushBotSquare.class);
 
-    manager.register("AtlerTeleOpLesson5", AtlerTeleOpLesson5.class);
     manager.register("AtlerTouchSensorTest", AtlerTouchSensorTest.class);
     manager.register("MotorEncoderTest", MotorEncoderTest.class);
 
