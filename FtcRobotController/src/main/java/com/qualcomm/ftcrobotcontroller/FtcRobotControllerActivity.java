@@ -48,7 +48,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -61,7 +60,6 @@ import com.qualcomm.ftccommon.FtcRobotControllerService.FtcRobotControllerBinder
 import com.qualcomm.ftccommon.LaunchActivityConstantsList;
 import com.qualcomm.ftccommon.Restarter;
 import com.qualcomm.ftccommon.UpdateUI;
-import com.qualcomm.ftcrobotcontroller.opmodes.CameraOp;
 import com.qualcomm.ftcrobotcontroller.opmodes.FtcOpModeRegister;
 import com.qualcomm.hardware.HardwareFactory;
 import com.qualcomm.robotcore.hardware.configuration.Utility;
@@ -70,13 +68,9 @@ import com.qualcomm.robotcore.util.ImmersiveMode;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.wifi.WifiDirectAssistant;
 
-import android.widget.FrameLayout;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
-
-import android.hardware.Camera;
 
 public class FtcRobotControllerActivity extends Activity {
 
@@ -130,42 +124,6 @@ public class FtcRobotControllerActivity extends Activity {
     }
   };
 
-
-  /*
-    This is where the Camera Initialization is
-   */
-  public Camera camera;
-  private Camera openFrontFacingCamera() {
-    int cameraId = -1;
-    Camera cam = null;
-    int numberOfCameras = Camera.getNumberOfCameras();
-    for (int i = 0; i < numberOfCameras; i++) {
-      Camera.CameraInfo info = new Camera.CameraInfo();
-      Camera.getCameraInfo(i, info);
-      if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-        cameraId = i;
-        break;
-      }
-    }
-    try {
-      cam = Camera.open(cameraId);
-    } catch (Exception e) {
-
-    }
-    return cam;
-  }
-
-  public void initPreview(final Camera camera, final CameraOp context, final Camera.PreviewCallback previewCallback) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        context.preview = new CameraPreview(FtcRobotControllerActivity.this, camera, previewCallback);
-        FrameLayout previewLayout = (FrameLayout) findViewById(R.id.previewLayout);
-        previewLayout.addView(context.preview);
-      }
-    });
-  }
-
   @Override
   protected void onNewIntent(Intent intent) {
     super.onNewIntent(intent);
@@ -178,8 +136,6 @@ public class FtcRobotControllerActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    camera=openFrontFacingCamera();
 
     setContentView(R.layout.activity_ftc_controller);
 
