@@ -25,6 +25,9 @@ public class MotorEncoderTest extends LinearOpMode{
         //leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
         leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
 
+        rightFrontMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+        telemetry.addData("Right Front Encoder", rightFrontMotor.getCurrentPosition());
+
         waitForStart();
 
         rightFrontMotor.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
@@ -32,11 +35,11 @@ public class MotorEncoderTest extends LinearOpMode{
 
         telemetry.addData("Right Front Encoder", rightFrontMotor.getCurrentPosition());
 
-        while(rightFrontMotor.getCurrentPosition() < 500) {
-            //leftFrontMotor.setPower(0.5);
-            leftBackMotor.setPower(0.5);
-            rightFrontMotor.setPower(0.5);
-            //rightBackMotor.setPower(0.5);
+        while(rightFrontMotor.getCurrentPosition() < 1000) {
+            //leftFrontMotor.setPower(0.3);
+            leftBackMotor.setPower(0.3);
+            rightFrontMotor.setPower(0.3);
+            //rightBackMotor.setPower(0.3);
 
             telemetry.addData("Right Front Encoder", rightFrontMotor.getCurrentPosition());
         }
