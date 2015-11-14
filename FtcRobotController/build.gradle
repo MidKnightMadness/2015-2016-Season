@@ -52,6 +52,10 @@ task uploadToPhone(type:Exec){
     } else {
         commandLine 'adb', 'push', 'robot_configurations', '/storage/sdcard0/FIRST'
     }
+    standardOutput = new ByteArrayOutputStream()
+    ext.output = {
+        return standardOutput.toString()
+    }
 }
 task downloadFromPhone(type:Exec){
     if(Os.isFamily(Os.FAMILY_WINDOWS)){
