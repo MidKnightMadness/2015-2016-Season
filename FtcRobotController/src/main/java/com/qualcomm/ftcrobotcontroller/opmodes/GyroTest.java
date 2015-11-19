@@ -3,6 +3,7 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.ftcrobotcontroller.common.GyroWorkerThread;
 import com.qualcomm.ftcrobotcontroller.common.MotorGroup;
 import com.qualcomm.ftcrobotcontroller.common.TKAOpmode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 
@@ -27,7 +28,7 @@ public class GyroTest extends TKAOpmode {
         front_right.setDirection(DcMotor.Direction.REVERSE);
         back_right.setDirection(DcMotor.Direction.REVERSE);
         gyroSensor = this.hardwareMap.gyroSensor.get("gyro");
-        gyro = new GyroWorkerThread(gyroSensor);
+        gyro = new GyroWorkerThread(this, gyroSensor);
         gyro.start();
     }
 
