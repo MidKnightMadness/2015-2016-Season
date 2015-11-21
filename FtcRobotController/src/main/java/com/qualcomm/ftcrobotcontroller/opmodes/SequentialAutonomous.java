@@ -87,7 +87,7 @@ public class SequentialAutonomous extends TKAOpmode {
         boolean reset = true;
         for (DcMotor m : motor) {
             if (!hasEncoderReset(m)) {
-                reset = true;
+                reset = false;
                 break;
             }
         }
