@@ -24,13 +24,18 @@ public class AutonomousToMountain extends OpMode {
 
     @Override
     public void start() {
-        turnDistance(1000, 0.75F);
+        driveDistance(1000, 0.3F);
+//        turnDistance(-5000, 0.75F);
+//        driveDistance(-3000, -0.75F);
+//        turnDistance(1000, 0.75F);
+//        driveDistance(5000, 0.75F);
     }
 
     @Override
     public void loop() {
         telemetry.addData("Left", leftMotor.getCurrentPosition());
         telemetry.addData("Right", rightMotor.getCurrentPosition());
+        telemetry.addData("LeftTarget", leftMotor.getTargetPosition());
     }
 
     void driveDistance(int encoderDistance, float power) {
@@ -49,6 +54,6 @@ public class AutonomousToMountain extends OpMode {
         leftMotor.setTargetPosition(encoderDistance);
         rightMotor.setTargetPosition(-encoderDistance);
         leftMotor.setPower(power);
-        rightMotor.setPower(-power);
+        rightMotor.setPower(power);
     }
 }
