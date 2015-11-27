@@ -2,7 +2,6 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.ftcrobotcontroller.common.GyroWorkerThread;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
@@ -30,6 +29,7 @@ public class AutonomousStraightGyro extends LinearOpMode {
 
         waitForStart();
 
+        left.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         right.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
         driveDistance(5000, 0.3);
@@ -46,18 +46,20 @@ public class AutonomousStraightGyro extends LinearOpMode {
             telemetry.addData("RightPower", right.getPower());
 
             leftPower = power - gyro.heading() / 200;
-            if(leftPower > 1)
-                leftPower = 1;
-            else if(leftPower < -1)
-                leftPower = -1;
+            if(leftPower > 0.5)
+                leftPower = 0.5;
+            else if(leftPower < 0.1)
+                leftPower = 0.1;
             left.setPower(leftPower);
 
+
             rightPower = power + gyro.heading() / 200;
-            if(rightPower > 1)
-                rightPower = 1;
-            else if(rightPower < -1)
-                rightPower = -1;
+            if(rightPower > 0.5)
+                rightPower = 0.5;
+            else if(rightPower < 0.1)
+                rightPower = 0.1;
             right.setPower(rightPower);
+
         }
         //}
         resetEncoders();
