@@ -74,4 +74,3 @@ task downloadFromPhone(type:Exec){
 task(updateRobotConfiguration) << {
 }
 updateRobotConfiguration.dependsOn downloadFromPhone, uploadToPhone
-build.dependsOn updateRobotConfiguration
