@@ -64,6 +64,10 @@ public class GyroWorkerThread extends Thread{
         this.state = State.CALIBRATING;
     }
 
+    public synchronized boolean isCalibrating(){
+        return this.state == State.CALIBRATING;
+    }
+
     public enum State{
         UNKNOWN,
         CALIBRATING,
