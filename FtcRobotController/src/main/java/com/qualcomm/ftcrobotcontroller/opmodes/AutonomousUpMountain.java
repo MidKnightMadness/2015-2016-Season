@@ -1,42 +1,46 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 
+import com.qualcomm.ftcrobotcontroller.common.GyroWorkerThread;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 
 public class AutonomousUpMountain extends LinearOpMode{
 
     private DcMotor left;
     private DcMotor right;
+    GyroSensor gyroSensor;
+    GyroWorkerThread gyro;
+    double leftPower;
+    double rightPower;
 
     @Override
     public void runOpMode() throws InterruptedException {
         left = hardwareMap.dcMotor.get("left");
         right = hardwareMap.dcMotor.get("right");
         left.setDirection(DcMotor.Direction.REVERSE);
+        gyroSensor = this.hardwareMap.gyroSensor.get("gyro");
+        gyro = new GyroWorkerThread(this, gyroSensor);
+        gyro.start();
 
-        System.out.println("1");
         waitForStart();
 
-        System.out.println("2");
         resetEncoders();
 
-        System.out.println(3);
-        driveDistance(-2000, 0.5);
-        System.out.println(4);
+        driveDistance(-9500, 0.5);
+        turnDistance(-2750, 0.3);
 
-        telemetry.clearData();
-        telemetry.addData("Left", left.getCurrentPosition());
-        telemetry.addData("Right", right.getCurrentPosition());
 
-        turnDistance(1000, 0.5);
-        System.out.println(5);
-        driveDistance(-4000, 0.5);
-        System.out.println(6);
-        turnDistance(-2000, 0.5);
-        System.out.println(7);
-        driveDistance(5000, 0.5);
+        left.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        right.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        sleep(1000);
+
+        telemetry.addData("Gyro", gyro.heading());
+        driveGyroDistance(6000, 0.3);
+
+
     }
 
     private void driveDistance(int distance, double power) throws InterruptedException {
@@ -48,7 +52,7 @@ public class AutonomousUpMountain extends LinearOpMode{
         left.setPower(power);
         right.setPower(power);
         int abortTime = 0;
-        while(/*!posReached() &&*/ abortTime < 1500) {
+        while(/*!posReached() &&*/ abortTime < 5000) {
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LT", left.getTargetPosition());
@@ -70,7 +74,7 @@ public class AutonomousUpMountain extends LinearOpMode{
         left.setPower(power);
         right.setPower(power);
         int abortTime = 0;
-        while(/*!posReached()*/ abortTime < 3000) {
+        while(/*!posReached()*/ abortTime < 5000) {
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LT", left.getTargetPosition());
@@ -78,6 +82,36 @@ public class AutonomousUpMountain extends LinearOpMode{
             waitOneFullHardwareCycle();
             sleep(10);
             abortTime += 10;
+        }
+        resetEncoders();
+        waitOneFullHardwareCycle();
+        sleep(500);
+    }
+
+    private void driveGyroDistance(int distance, double power) throws InterruptedException {
+        left.setPower(power);
+        right.setPower(power);
+        while(right.getCurrentPosition() < distance) {
+            telemetry.addData("Left", left.getCurrentPosition());
+            telemetry.addData("Right", right.getCurrentPosition());
+            telemetry.addData("LeftPower", left.getPower());
+            telemetry.addData("RightPower", right.getPower());
+
+            leftPower = power - (gyro.heading() + 90) / 200;
+            if(leftPower > 0.5)
+                leftPower = 0.5;
+            else if(leftPower < 0.1)
+                leftPower = 0.1;
+            left.setPower(leftPower);
+
+
+            rightPower = power + (gyro.heading() + 90) / 200;
+            if(rightPower > 0.5)
+                rightPower = 0.5;
+            else if(rightPower < 0.1)
+                rightPower = 0.1;
+            right.setPower(rightPower);
+
         }
         resetEncoders();
         waitOneFullHardwareCycle();
