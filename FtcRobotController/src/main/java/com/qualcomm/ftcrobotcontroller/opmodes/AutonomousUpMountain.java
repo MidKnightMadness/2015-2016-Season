@@ -30,9 +30,9 @@ public class AutonomousUpMountain extends LinearOpMode{
         resetEncoders();
 
         driveDistance(-9500, 0.5);
-        turnDistance(-2750, 0.3);
+        turnDistance(-2100, 0.3);
 
-
+        stopMotors();
         left.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         right.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         sleep(1000);
@@ -52,7 +52,7 @@ public class AutonomousUpMountain extends LinearOpMode{
         left.setPower(power);
         right.setPower(power);
         int abortTime = 0;
-        while(/*!posReached() &&*/ abortTime < 5000) {
+        while(/*!posReached() &&*/ abortTime < 4500) {
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LT", left.getTargetPosition());
@@ -74,7 +74,7 @@ public class AutonomousUpMountain extends LinearOpMode{
         left.setPower(power);
         right.setPower(power);
         int abortTime = 0;
-        while(/*!posReached()*/ abortTime < 5000) {
+        while(/*!posReached()*/ abortTime < 4500) {
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LT", left.getTargetPosition());
@@ -127,6 +127,11 @@ public class AutonomousUpMountain extends LinearOpMode{
     private void setPos(DcMotor motor, int pos){
         motor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         motor.setTargetPosition(pos);
+    }
+
+    public void stopMotors() {
+        left.setPower(0);
+        right.setPower(0);
     }
 
 //    private boolean posReached(){
