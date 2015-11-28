@@ -30,8 +30,8 @@ public abstract class RedBlueOpMode extends OpMode {
             Constructor blueConstructor = clazz.getConstructor(TeamColor.class);
             OpMode redOpMode = (OpMode) redConstructor.newInstance(TeamColor.RED);
             OpMode blueOpMode = (OpMode) blueConstructor.newInstance(TeamColor.BLUE);
-            manager.register(String.format("[RED] %s", opModeName), redOpMode);
-            manager.register(String.format("[BLUE] %s", opModeName), blueOpMode);
+            manager.register(String.format("[R] %s", opModeName), redOpMode);
+            manager.register(String.format("[B] %s", opModeName), blueOpMode);
         } catch (Exception e) {
             // Fail silently
         }
