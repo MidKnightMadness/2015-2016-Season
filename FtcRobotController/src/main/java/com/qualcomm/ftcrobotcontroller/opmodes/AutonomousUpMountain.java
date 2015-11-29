@@ -1,16 +1,19 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-
 import com.qualcomm.ftcrobotcontroller.common.GyroWorkerThread;
+import com.qualcomm.ftcrobotcontroller.common.RedBlueLinearOpMode;
+import com.qualcomm.ftcrobotcontroller.common.RedBlueOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 
-public class AutonomousUpMountain extends LinearOpMode{
+public class AutonomousUpMountain extends LinearOpMode {
 
     private DcMotor left;
     private DcMotor right;
+    private DcMotor plow;
+    private DcMotor hangArm;
     GyroSensor gyroSensor;
     GyroWorkerThread gyro;
     double leftPower;
@@ -20,6 +23,8 @@ public class AutonomousUpMountain extends LinearOpMode{
     public void runOpMode() throws InterruptedException {
         left = hardwareMap.dcMotor.get("left");
         right = hardwareMap.dcMotor.get("right");
+        plow = hardwareMap.dcMotor.get("plow");
+        hangArm = hardwareMap.dcMotor.get("hangArm");
         left.setDirection(DcMotor.Direction.REVERSE);
         gyroSensor = this.hardwareMap.gyroSensor.get("gyro");
         gyro = new GyroWorkerThread(this, gyroSensor);
@@ -29,16 +34,14 @@ public class AutonomousUpMountain extends LinearOpMode{
 
         resetEncoders();
 
-        driveDistance(-9500, 0.5);
-        turnDistance(-2100, 0.3);
+        driveGyroDistance(-10000, 0.5, 0);
+        turnGyroDistance(90, 0.3);
 
         stopMotors();
-        left.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        right.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         sleep(1000);
 
         telemetry.addData("Gyro", gyro.heading());
-        driveGyroDistance(6000, 0.3);
+        driveGyroDistance(6000, 0.3, -90);
 
 
     }
@@ -66,6 +69,7 @@ public class AutonomousUpMountain extends LinearOpMode{
         resetEncoders();
         waitOneFullHardwareCycle();
         sleep(500);
+        stopMotors();
     }
 
     private void turnDistance(int distance, double power) throws InterruptedException{
@@ -86,36 +90,71 @@ public class AutonomousUpMountain extends LinearOpMode{
         resetEncoders();
         waitOneFullHardwareCycle();
         sleep(500);
+        stopMotors();
     }
 
-    private void driveGyroDistance(int distance, double power) throws InterruptedException {
+    private void turnGyroDistance(int target, double power) throws InterruptedException {
+        left.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        right.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         left.setPower(power);
-        right.setPower(power);
-        while(right.getCurrentPosition() < distance) {
+        right.setPower(-power);
+        while(Math.abs(gyro.heading()) < Math.abs(target)) {
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LeftPower", left.getPower());
             telemetry.addData("RightPower", right.getPower());
 
-            leftPower = power - (gyro.heading() + 90) / 200;
+            left.setPower(power + (Math.abs(target) - Math.abs(gyro.heading()) / 500));
+            right.setPower(-(power + (Math.abs(target) - Math.abs(gyro.heading())) / 500));
+
+            telemetry.addData("distance target", Math.abs(target) - Math.abs(gyro.heading()));
+        }
+        resetEncoders();
+        waitOneFullHardwareCycle();
+        sleep(500);
+        stopMotors();
+    }
+
+    private void driveGyroDistance(int distance, double power, int target) throws InterruptedException {
+        setPos(left, distance);
+        setPos(right, distance);
+        left.setPower(power);
+        right.setPower(power);
+        int abortTime = 0;
+        while(abortTime < 4500) {
+            telemetry.addData("Left", left.getCurrentPosition());
+            telemetry.addData("Right", right.getCurrentPosition());
+            telemetry.addData("LeftPower", left.getPower());
+            telemetry.addData("RightPower", right.getPower());
+            sleep(10);
+            abortTime += 10;
+
+            if(distance > 0) {
+                leftPower = power - (target - gyro.heading()) / 200;
+                rightPower = power + (target - gyro.heading()) / 200;
+            } else {
+                leftPower = power + (target - gyro.heading()) / 200;
+                rightPower = power - (target - gyro.heading()) / 200;
+            }
+
             if(leftPower > 0.5)
                 leftPower = 0.5;
             else if(leftPower < 0.1)
                 leftPower = 0.1;
             left.setPower(leftPower);
 
-
-            rightPower = power + (gyro.heading() + 90) / 200;
             if(rightPower > 0.5)
                 rightPower = 0.5;
             else if(rightPower < 0.1)
                 rightPower = 0.1;
             right.setPower(rightPower);
 
+
         }
         resetEncoders();
         waitOneFullHardwareCycle();
         sleep(500);
+        stopMotors();
     }
 
     private void resetEncoders() {
