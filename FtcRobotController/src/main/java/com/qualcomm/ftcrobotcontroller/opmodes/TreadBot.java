@@ -1,6 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 
+import com.qualcomm.ftcrobotcontroller.common.Values;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
@@ -13,7 +14,6 @@ public class TreadBot extends OpMode {
     private DcMotor hangArm;
     private DcMotor plow;
     boolean encReset = false;
-    boolean isHanging = false;
     private int driveToggle = 0;
     @Override
     public void init() {
@@ -63,8 +63,6 @@ public class TreadBot extends OpMode {
 
     private void updateArm() {
 
-
-        if(!isHanging) {
             int armInc = 200;
             //game pad 1
             if (gamepad1.dpad_up) {
@@ -87,23 +85,17 @@ public class TreadBot extends OpMode {
                 hangArm.setTargetPosition(hangArm.getCurrentPosition());
                 hangArm.setPower(0);
             }
-        }
 
         //hang
-        //TODO: Debug this
-        /*if(gamepad2.b && gamepad2.start) {
-            isHanging = true;
+        if(gamepad2.b && gamepad2.start) {
             hangArm.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            hangArm.setTargetPosition(-3900);
+            hangArm.setTargetPosition(Values.HAMGARM_HANG);
             hangArm.setPower(1);
         }
 
-        TODO:AUSTIN!!! NEVER USE START + B OR START + A!!! THOSE ARE THE BUTTONS TO CONNECT! IT ACTUALLY CAUSES ISSUES!!
-        */
-
         //deploy
         if (gamepad2.x) {
-            hangArm.setTargetPosition(-16000);
+            hangArm.setTargetPosition(Values.HANGARM_DEPLOY);
             hangArm.setPower(1);
         }
 
