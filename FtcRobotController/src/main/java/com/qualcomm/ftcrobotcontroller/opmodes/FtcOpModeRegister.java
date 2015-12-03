@@ -75,7 +75,8 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register("AutonomousToMountain", AutonomousToMountain.class);
     manager.register("SequentialOpMode", SequentialAutonomous.class);
     manager.register("LinearSequentailOpMode", LinearSequential.class);
-    manager.register("Burke Auto Floor", BurkeAutoFloor.class);
+    manager.register("FloorGoalBlue", FloorGoalBlue.class);
+    manager.register("FloorGoalRed", FloorGoalRed.class);
 
     RedBlueOpMode.register("RedBlueTest", RedBlueExample.class, manager);
     //manager.register("AdafruitRGBExample", AdafruitRGBExample.class);

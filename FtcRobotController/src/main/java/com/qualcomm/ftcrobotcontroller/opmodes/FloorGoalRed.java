@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 /**
  * Created by Nathan on 11/27/2015.
  */
-public class BurkeAutoFloor extends LinearOpMode {
+public class FloorGoalRed extends LinearOpMode {
 
     DcMotor leftMotor;
     DcMotor rightMotor;
@@ -76,7 +76,7 @@ public class BurkeAutoFloor extends LinearOpMode {
 
     }
 
-    public void plowUp() {;
+    public void plowUp() {
 
         plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
 
@@ -99,6 +99,10 @@ public class BurkeAutoFloor extends LinearOpMode {
 
         waitForStart();
 
+
+        //this is for red team
+
+
         plowDown();
         sleep(1500);
 
@@ -110,7 +114,7 @@ public class BurkeAutoFloor extends LinearOpMode {
         sleep(2500);
 
         //distance, left Power, right Power
-        turn(18, 0, -0.75);
+        turn(18, -0.75, 0);
         sleep(4000);
 
 
@@ -122,3 +126,4 @@ public class BurkeAutoFloor extends LinearOpMode {
 
     }
 }
+
