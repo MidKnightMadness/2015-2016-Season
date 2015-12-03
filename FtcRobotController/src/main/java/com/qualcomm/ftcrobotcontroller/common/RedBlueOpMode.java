@@ -4,15 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 
 public abstract class RedBlueOpMode extends OpMode {
 
     public TeamColor teamColor;
-
-    public RedBlueOpMode(TeamColor color) {
-        this.teamColor = color;
-    }
-
 
     /**
      * Registers two OpModes (Red and blue) when given a RedBlue
@@ -26,10 +22,12 @@ public abstract class RedBlueOpMode extends OpMode {
      */
     public static void register(String opModeName, Class<? extends OpMode> clazz, OpModeManager manager) {
         try {
-            Constructor redConstructor = clazz.getConstructor(TeamColor.class);
-            Constructor blueConstructor = clazz.getConstructor(TeamColor.class);
-            OpMode redOpMode = (OpMode) redConstructor.newInstance(TeamColor.RED);
-            OpMode blueOpMode = (OpMode) blueConstructor.newInstance(TeamColor.BLUE);
+            OpMode redOpMode = clazz.newInstance();
+            OpMode blueOpMode = clazz.newInstance();
+            Field teamColorField = clazz.getField("teamColor");
+            teamColorField.setAccessible(true);
+            teamColorField.set(redOpMode, TeamColor.RED);
+            teamColorField.set(blueOpMode, TeamColor.BLUE);
             manager.register(String.format("[R] %s", opModeName), redOpMode);
             manager.register(String.format("[B] %s", opModeName), blueOpMode);
         } catch (Exception e) {
