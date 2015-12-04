@@ -75,8 +75,7 @@ public class FtcOpModeRegister implements OpModeRegister {
 //    manager.register("AutonomousToMountain", AutonomousToMountain.class);
 //    manager.register("SequentialOpMode", SequentialAutonomous.class);
 //    manager.register("LinearSequentailOpMode", LinearSequential.class);
-    RedBlueOpMode.register("[AUTO]FloorGoalBlue", FloorGoalBlue.class, manager);
-    RedBlueOpMode.register("{AUTO]FloorGoalRed", FloorGoalRed.class, manager);
+    RedBlueOpMode.register("[AUTO]FloorGoal", FloorGoal.class, manager);
     RedBlueOpMode.register("[AUTO]AutoUpMountain", AutonomousUpMountain.class, manager);
 
    // RedBlueOpMode.register("RedBlueTest", RedBlueExample.class, manager);

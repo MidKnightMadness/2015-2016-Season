@@ -109,7 +109,7 @@ public class TreadBot extends OpMode {
         }
         else if (gamepad1.a) {
             plow.setTargetPosition(plow.getCurrentPosition() - plowInc);
-            plow.setPower(1);
+            plow.setPower(-1);
         }
         else if (gamepad1.right_bumper){
             plow.setTargetPosition(plow.getCurrentPosition() + plowInc);
