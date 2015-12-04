@@ -1,15 +1,16 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.ftcrobotcontroller.common.RedBlueLinearOpMode;
 
+import com.qualcomm.ftcrobotcontroller.common.RedBlueOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 
 /**
  * Created by Nathan on 11/27/2015.
  */
-public class FloorGoalBlue extends LinearOpMode {
+public class FloorGoal extends RedBlueLinearOpMode {
 
     DcMotor leftMotor;
     DcMotor rightMotor;
@@ -113,7 +114,10 @@ public class FloorGoalBlue extends LinearOpMode {
         sleep(2500);
 
         //distance, left Power, right Power
-        turn(-24, 0, -0.75);
+        if(teamColor == RedBlueOpMode.TeamColor.BLUE)
+            turn(-24, 0, -0.75);
+        else if(teamColor == RedBlueOpMode.TeamColor.RED)
+            turn(-24, -0.75, 0);
         sleep(4000);
 
 
