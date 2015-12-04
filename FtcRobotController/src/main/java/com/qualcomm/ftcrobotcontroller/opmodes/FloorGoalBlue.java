@@ -103,7 +103,6 @@ public class FloorGoalBlue extends LinearOpMode {
         //This is for blue side
 
 
-
         plowDown();
         sleep(1500);
 

@@ -94,7 +94,7 @@ public class FloorGoalRed extends LinearOpMode {
 
         plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
 
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftMotor.setDirection(DcMotor.Direction.REVERSE);
 
 
         waitForStart();
@@ -106,15 +106,14 @@ public class FloorGoalRed extends LinearOpMode {
         plowDown();
         sleep(1500);
 
-        driveForward(55, -0.5);
-        sleep(8000);
-
+        driveForward(-70, -0.5);
+        sleep(10000);
 
         plowUp();
         sleep(2500);
 
         //distance, left Power, right Power
-        turn(18, -0.75, 0);
+        turn(-24, -0.75, 0);
         sleep(4000);
 
 
