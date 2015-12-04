@@ -3,12 +3,12 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.ftcrobotcontroller.common.GyroWorkerThread;
 import com.qualcomm.ftcrobotcontroller.common.RedBlueLinearOpMode;
 import com.qualcomm.ftcrobotcontroller.common.RedBlueOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.ftcrobotcontroller.common.Values;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 
-public class AutonomousUpMountain extends LinearOpMode {
+public class AutonomousUpMountain extends RedBlueLinearOpMode {
 
     private DcMotor left;
     private DcMotor right;
@@ -34,14 +34,43 @@ public class AutonomousUpMountain extends LinearOpMode {
 
         resetEncoders();
 
-        driveGyroDistance(-10000, 0.5, 0);
-        turnGyroDistance(90, 0.3);
+        hangArm.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+
+
+        plow.setTargetPosition(Values.PLOW_DEPLOY);
+        plow.setPower(0.5);
+
+        sleep(3000);
+//        while(!(Math.abs(plow.getTargetPosition() - plow.getCurrentPosition()) < 5)){
+//            waitOneFullHardwareCycle();
+//        }
+
+//        while(!(Math.abs(hangArm.getTargetPosition() - hangArm.getCurrentPosition()) < 5)){
+//            waitOneFullHardwareCycle();
+//        }
+
+        driveGyroDistance(-10000, 0.5, 0); // was 10000, needs to be much less, 7500 too low
+
+//        hangArm.setTargetPosition(Values.HANGARM_DEPLOY);
+//        hangArm.setPower(0.5);
+//
+//        sleep(3000);
+
+        if(teamColor == RedBlueOpMode.TeamColor.BLUE)
+            turnGyroDistance(-90, -0.2);
+        else if(teamColor == RedBlueOpMode.TeamColor.RED)
+            turnGyroDistance(90, 0.2);
 
         stopMotors();
         sleep(1000);
 
         telemetry.addData("Gyro", gyro.heading());
-        driveGyroDistance(6000, 0.3, -90);
+
+        if(teamColor == RedBlueOpMode.TeamColor.BLUE)
+            driveGyroDistance(8000, 0.3, -90);
+        else if(teamColor == RedBlueOpMode.TeamColor.RED)
+            driveGyroDistance(8000, 0.3, 90);
 
 
     }
@@ -55,7 +84,7 @@ public class AutonomousUpMountain extends LinearOpMode {
         left.setPower(power);
         right.setPower(power);
         int abortTime = 0;
-        while(/*!posReached() &&*/ abortTime < 4500) {
+        while(abortTime < 4500) {
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LT", left.getTargetPosition());
@@ -65,7 +94,6 @@ public class AutonomousUpMountain extends LinearOpMode {
             sleep(10);
             abortTime += 10;
         }
-        //}
         resetEncoders();
         waitOneFullHardwareCycle();
         sleep(500);
@@ -78,7 +106,7 @@ public class AutonomousUpMountain extends LinearOpMode {
         left.setPower(power);
         right.setPower(power);
         int abortTime = 0;
-        while(/*!posReached()*/ abortTime < 4500) {
+        while(abortTime < 4500) {
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LT", left.getTargetPosition());
@@ -104,8 +132,13 @@ public class AutonomousUpMountain extends LinearOpMode {
             telemetry.addData("LeftPower", left.getPower());
             telemetry.addData("RightPower", right.getPower());
 
-            left.setPower(power + (Math.abs(target) - Math.abs(gyro.heading()) / 500));
-            right.setPower(-(power + (Math.abs(target) - Math.abs(gyro.heading())) / 500));
+            left.setPower(power);
+            right.setPower(-power);
+
+            if(Math.abs(gyro.heading() - (target)) < 10) {
+                left.setPower(power - 0.15);
+                right.setPower(-(power - 0.15));
+            }
 
             telemetry.addData("distance target", Math.abs(target) - Math.abs(gyro.heading()));
         }
@@ -121,7 +154,7 @@ public class AutonomousUpMountain extends LinearOpMode {
         left.setPower(power);
         right.setPower(power);
         int abortTime = 0;
-        while(abortTime < 4500) {
+        while(abortTime < 6500) { //4500 not enough
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LeftPower", left.getPower());
@@ -130,11 +163,11 @@ public class AutonomousUpMountain extends LinearOpMode {
             abortTime += 10;
 
             if(distance > 0) {
-                leftPower = power - (target - gyro.heading()) / 200;
-                rightPower = power + (target - gyro.heading()) / 200;
+                leftPower = power - (gyro.heading() - target) / 200;
+                rightPower = power + (gyro.heading() - target) / 200;
             } else {
-                leftPower = power + (target - gyro.heading()) / 200;
-                rightPower = power - (target - gyro.heading()) / 200;
+                leftPower = power + (gyro.heading() - target) / 200;
+                rightPower = power - (gyro.heading() - target) / 200;
             }
 
             if(leftPower > 0.5)
@@ -160,7 +193,9 @@ public class AutonomousUpMountain extends LinearOpMode {
     private void resetEncoders() {
         left.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         right.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        //while(!haveEncodersReset()) 11/23/15 Josh
+
+        hangArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
     }
 
     private void setPos(DcMotor motor, int pos){
@@ -173,19 +208,4 @@ public class AutonomousUpMountain extends LinearOpMode {
         right.setPower(0);
     }
 
-//    private boolean posReached(){
-//        return hasEncoderReachedPosition(left) && hasEncoderReachedPosition(right);
-//    }
-
-
-//    private boolean hasEncoderReachedPosition(DcMotor motor){
-//        return (Math.abs(motor.getCurrentPosition() - motor.getTargetPosition()) < 3);
-//    }
-// 11/23/15 Josh
-//    private boolean haveEncodersReset(){
-//        return hasEncoderReset(left) && hasEncoderReset(right);
-//    }
-//    private boolean hasEncoderReset(DcMotor motor){
-//        return motor.getCurrentPosition() == 0;
-//    }
 }
