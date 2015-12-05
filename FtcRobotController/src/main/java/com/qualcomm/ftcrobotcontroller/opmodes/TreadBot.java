@@ -14,7 +14,9 @@ public class TreadBot extends OpMode {
     private DcMotor hangArm;
     private DcMotor plow;
     boolean encReset = false;
-    private int driveToggle = 0;
+    private boolean reverse = false;
+    private boolean reversePressed = false;
+
     @Override
     public void init() {
         left = hardwareMap.dcMotor.get("left");
@@ -37,21 +39,15 @@ public class TreadBot extends OpMode {
         }
 
 
-        if(driveToggle == 0){
-            left.setPower(gamepad1.left_stick_y);
-            right.setPower(gamepad1.right_stick_y);
-        }
-        else if(driveToggle == 1) {
-            left.setPower(-gamepad1.left_stick_y);
-            right.setPower(-gamepad1.right_stick_y);
-        }
+        left.setPower((reverse)? gamepad1.left_stick_y : -gamepad1.right_stick_y);
+        right.setPower((reverse)? gamepad1.right_stick_y : -gamepad1.left_stick_y);
 
         telemetry.addData("left_power", left.getPower());
         telemetry.addData("right_power", right.getPower());
         telemetry.addData("hangArmPos", hangArm.getCurrentPosition());
         telemetry.addData("plowPos", plow.getCurrentPosition());
         telemetry.addData("rightBumper", gamepad1.right_trigger);
-        telemetry.addData("driveToggle", driveToggle);
+        telemetry.addData("reverse", reverse);
         updateArm();
         updatePlow();
         updateDrive();
@@ -139,36 +135,21 @@ public class TreadBot extends OpMode {
             plow.setTargetPosition(plow.getCurrentPosition() - plowInc);
             plow.setPower(-1);
         }
-        //
         else {
             plow.setTargetPosition(plow.getCurrentPosition());
             plow.setPower(0);
-
-        //manually reset plow encoders
-            /*
-        if (gamepad1.start) {
-            plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-            plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        }
-        else if (gamepad2.start) {
-            plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-            plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-
-        }
-
-        */
-
         }
     }
     //toggle the driving by pressing the stick buttons
     private void updateDrive() {
-        if(driveToggle > 1) {
-            driveToggle = 0;
+        if((gamepad1.left_stick_button || gamepad1.right_stick_button) && !reversePressed) {
+            reverse = !reverse;
+            reversePressed = true;
+        } else {
+            if(!(gamepad1.left_stick_button || gamepad1.right_stick_button)){
+                reversePressed = false;
+            }
         }
-        else if(gamepad1.left_stick_button || gamepad1.right_stick_button) {
-            driveToggle += 1;
-        }
-
     }
 }
 
