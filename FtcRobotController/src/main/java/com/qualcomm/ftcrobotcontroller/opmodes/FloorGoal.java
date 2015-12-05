@@ -4,6 +4,7 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.ftcrobotcontroller.common.RedBlueLinearOpMode;
 
 import com.qualcomm.ftcrobotcontroller.common.RedBlueOpMode;
+import com.qualcomm.ftcrobotcontroller.common.Values;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 
@@ -32,13 +33,18 @@ public class FloorGoal extends RedBlueLinearOpMode {
         leftMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         rightMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
 
-        leftMotor.setTargetPosition((int) totalDistance);
-        rightMotor.setTargetPosition((int) totalDistance);
-
-        leftMotor.setPower(powerLeft);
-        rightMotor.setPower(powerRight);
-
-
+        if(Math.abs(powerLeft) > 0) {
+            leftMotor.setTargetPosition((int) totalDistance);
+            leftMotor.setPower(powerLeft);
+        } else {
+            leftMotor.setTargetPosition(leftMotor.getCurrentPosition());
+        }
+        if(Math.abs(powerRight) > 0) {
+            rightMotor.setTargetPosition((int) totalDistance);
+            rightMotor.setPower(powerRight);
+        } else {
+            rightMotor.setTargetPosition(rightMotor.getCurrentPosition());
+        }
     }
 
     public void driveForward(int distance, double power){
@@ -62,9 +68,6 @@ public class FloorGoal extends RedBlueLinearOpMode {
         rightMotor.setPower(power);
 
         telemetry.addData("Power: ", power);
-
-
-
     }
 
     public void plowDown() {
@@ -72,7 +75,7 @@ public class FloorGoal extends RedBlueLinearOpMode {
 
         plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
 
-        plow.setTargetPosition(-4000);
+        plow.setTargetPosition(Values.PLOW_DEPLOY);
         plow.setPower(1);
 
     }
@@ -81,7 +84,7 @@ public class FloorGoal extends RedBlueLinearOpMode {
 
         plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
 
-        plow.setTargetPosition(0);
+        plow.setTargetPosition(Values.PLOW_RETRACT);
         plow.setPower(-1);
 
     }
@@ -119,17 +122,5 @@ public class FloorGoal extends RedBlueLinearOpMode {
         else if(teamColor == RedBlueOpMode.TeamColor.RED)
             turn(-24, -0.75, 0);
         sleep(4000);
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }
