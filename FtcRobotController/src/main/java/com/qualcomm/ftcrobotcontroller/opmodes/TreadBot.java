@@ -85,16 +85,19 @@ public class TreadBot extends OpMode {
                 hangArm.setPower(0);
             }
         //hang
-        if(gamepad2.b && gamepad2.start) {
+        /*if(gamepad2.b && gamepad2.start) {
             hangArm.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
             hangArm.setTargetPosition(Values.HAMGARM_HANG);
             hangArm.setPower(1);
         }
+        */
         //deploy
+        /*
         if (gamepad2.x) {
             hangArm.setTargetPosition(Values.HANGARM_DEPLOY);
             hangArm.setPower(1);
         }
+        */
 
     }
 

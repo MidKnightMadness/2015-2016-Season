@@ -37,7 +37,6 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         hangArm.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
 
-
         plow.setTargetPosition(Values.PLOW_DEPLOY);
         plow.setPower(0.5);
 
@@ -50,7 +49,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
 //            waitOneFullHardwareCycle();
 //        }
 
-        driveGyroDistance(-10000, 0.5, 0); // was 10000, needs to be much less, 7500 too low
+        driveGyroDistance(-10250, 0.5, 0); // was 10000
 
 //        hangArm.setTargetPosition(Values.HANGARM_DEPLOY);
 //        hangArm.setPower(0.5);
@@ -67,10 +66,14 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
 
         telemetry.addData("Gyro", gyro.heading());
 
-        if(teamColor == RedBlueOpMode.TeamColor.BLUE)
-            driveGyroDistance(8000, 0.3, -90);
+        if(teamColor == RedBlueOpMode.TeamColor.BLUE) // was 8000, increasing slightly
+            driveGyroDistance(13000, 0.3, -90);
         else if(teamColor == RedBlueOpMode.TeamColor.RED)
-            driveGyroDistance(8000, 0.3, 90);
+            driveGyroDistance(13000, 0.3, 90);
+
+        plow.setTargetPosition(Values.PLOW_RETRACT); //added this to pull up plow
+        plow.setPower(0.5);
+        sleep(3000);
 
 
     }
