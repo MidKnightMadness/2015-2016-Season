@@ -39,8 +39,8 @@ public class TreadBot extends OpMode {
         }
 
 
-        left.setPower((reverse)? gamepad1.left_stick_y : -gamepad1.right_stick_y);
-        right.setPower((reverse)? gamepad1.right_stick_y : -gamepad1.left_stick_y);
+        left.setPower((reverse)? -gamepad1.right_stick_y : gamepad1.left_stick_y);
+        right.setPower((reverse)? -gamepad1.left_stick_y : gamepad1.right_stick_y);
 
         telemetry.addData("left_power", left.getPower());
         telemetry.addData("right_power", right.getPower());
