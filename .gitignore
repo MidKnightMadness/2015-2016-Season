@@ -19,14 +19,10 @@ Thumbs.db
 .DS_Store
 
 # Android Studio
-/**/*.iml
-/.idea
-/.gradle
-/**/build
-/out
-/.idea
-/*.iml
-/*.ipr
-/*.iws
+*.iml
+.idea
+.gradle
+build/
 
 *ASUS_PC_01*
+

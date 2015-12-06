@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
-
+import org.apache.tools.ant.taskdefs.condition.Os
 android {
-    compileSdkVersion = 'Google Inc.:Google APIs:19'
-    buildToolsVersion = '21.1.2'
-
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 19
     }
+    compileSdkVersion 'Google Inc.:Google APIs:19'
+    buildToolsVersion '21.1.2'
 }
 
 buildscript {
@@ -39,10 +38,39 @@ allprojects {
 
 dependencies {
     compile files('libs/android-support-v4.jar')
-    compile (name:'RobotCore-release', ext:'aar')
-    compile (name:'Hardware-release', ext:'aar')
-    compile (name:'FtcCommon-release', ext:'aar')
-    compile (name:'ModernRobotics-release', ext:'aar')
-    compile (name:'Analytics-release', ext:'aar')
-    compile (name:'WirelessP2p-release', ext:'aar')
+    compile(name: 'RobotCore-release', ext: 'aar')
+    compile(name: 'Hardware-release', ext: 'aar')
+    compile(name: 'FtcCommon-release', ext: 'aar')
+    compile(name: 'ModernRobotics-release', ext: 'aar')
+    compile(name: 'Analytics-release', ext: 'aar')
+    compile(name: 'WirelessP2p-release', ext: 'aar')
 }
+task uploadToPhone(type:Exec){
+    if(Os.isFamily(Os.FAMILY_WINDOWS)){
+        logger.warn('Windows is currently untested!')
+        commandLine 'cmd', '/c', 'adb', 'push', 'robot_configurations', '/storage/sdcard0/FIRST'
+    } else {
+        commandLine 'adb', 'push', 'robot_configurations', '/storage/sdcard0/FIRST'
+    }
+    standardOutput = new ByteArrayOutputStream()
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+task downloadFromPhone(type:Exec){
+    if(Os.isFamily(Os.FAMILY_WINDOWS)){
+        logger.warn('Windows is currnetly untested!')
+        commandLine 'cmd', '/c', 'adb', 'pull', '/storage/sdcard0/FIRST', 'robot_configurations'
+    } else {
+        commandLine 'adb', 'pull', '/storage/sdcard0/FIRST', 'robot_configurations'
+    }
+    standardOutput = new ByteArrayOutputStream()
+
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+task(updateRobotConfiguration) << {
+}
+updateRobotConfiguration.dependsOn downloadFromPhone, uploadToPhone
