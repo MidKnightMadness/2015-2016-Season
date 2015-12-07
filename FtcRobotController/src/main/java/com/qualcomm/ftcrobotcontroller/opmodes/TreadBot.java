@@ -25,6 +25,7 @@ public class TreadBot extends OpMode {
         hangArm = hardwareMap.dcMotor.get("hangArm");
         plow = hardwareMap.dcMotor.get("plow");
         right.setDirection(DcMotor.Direction.REVERSE);
+        hangArm.setDirection(DcMotor.Direction.REVERSE);
 
         hangArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
@@ -78,7 +79,7 @@ public class TreadBot extends OpMode {
             //
             else {
                 hangArm.setTargetPosition(hangArm.getCurrentPosition());
-                hangArm.setPower(0);
+//                hangArm.setPower(0);
             }
         //hang
         /*if(gamepad2.b && gamepad2.start) {
