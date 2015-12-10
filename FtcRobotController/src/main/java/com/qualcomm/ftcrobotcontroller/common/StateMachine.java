@@ -78,6 +78,16 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
         inject(next, "gamepad2", Gamepad.class, opMode.gamepad2);
         inject(next, "telemetry", Telemetry.class, opMode.telemetry);
         inject(next, "parent", opMode.getClass(), opMode);
+        if(opMode instanceof RedBlueOpMode){
+            Field tcField = opMode.getClass().getField("teamColor");
+            if(tcField != null){
+                tcField.setAccessible(true);
+                Object teamColorObj = tcField.get(opMode);
+                if(teamColorObj instanceof RedBlueOpMode.TeamColor){
+                    inject(next, "teamColor", RedBlueOpMode.TeamColor.class, (RedBlueOpMode.TeamColor) teamColorObj);
+                }
+            }
+        }
         next.runState();
         if (next.shouldChangeState()) {
             next.end();
