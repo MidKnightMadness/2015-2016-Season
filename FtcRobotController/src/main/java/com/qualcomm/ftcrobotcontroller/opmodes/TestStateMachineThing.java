@@ -7,14 +7,14 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 
 public class TestStateMachineThing extends OpMode {
 
-    private StateMachine<TestStateMachineThing.States, OpMode> stateMachine;
+    private StateMachine<States> stateMachine;
 
     private DcMotor left;
     private DcMotor right;
 
     @Override
     public void init() {
-        stateMachine = new StateMachine<States, OpMode>(States.RESET_ENCODERS, this);
+        stateMachine = new StateMachine<States>(States.RESET_ENCODERS, this);
         left = hardwareMap.dcMotor.get("left");
         right = hardwareMap.dcMotor.get("right");
     }
@@ -49,7 +49,7 @@ public class TestStateMachineThing extends OpMode {
             }
 
             @Override
-            public void postState() {
+            public void end() {
                 parent.left.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
                 parent.right.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
             }
@@ -69,7 +69,7 @@ public class TestStateMachineThing extends OpMode {
             }
 
             @Override
-            public void postState() {
+            public void end() {
 
             }
         }
