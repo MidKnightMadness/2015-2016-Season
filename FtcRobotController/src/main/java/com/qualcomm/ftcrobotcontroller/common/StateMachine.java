@@ -85,7 +85,7 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
                     tcField.setAccessible(true);
                     Object teamColorObj = tcField.get(opMode);
                     if (teamColorObj instanceof RedBlueOpMode.TeamColor) {
-                        inject(next, "teamColor", RedBlueOpMode.TeamColor.class, (RedBlueOpMode.TeamColor) teamColorObj);
+                        inject(next, "teamColor", RedBlueOpMode.TeamColor.class, teamColorObj);
                     }
                 }
             }
