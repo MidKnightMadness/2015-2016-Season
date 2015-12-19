@@ -53,6 +53,11 @@ public class TestStateMachineThing extends OpMode {
                 parent.left.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
                 parent.right.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
             }
+
+            @Override
+            public void tick() {
+
+            }
         },
         DRIVE_FORWARD {
             TestStateMachineThing parent;
@@ -70,6 +75,11 @@ public class TestStateMachineThing extends OpMode {
 
             @Override
             public void end() {
+
+            }
+
+            @Override
+            public void tick() {
 
             }
         }

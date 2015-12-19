@@ -122,6 +122,7 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
                 isRunning = false;
                 return;
             }
+            getCurrentState().tick();
             if (getCurrentState().shouldChangeState()) {
                 getCurrentState().end();
                 executeNext();
@@ -262,5 +263,7 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
         void runState();
 
         void end();
+
+        void tick();
     }
 }
