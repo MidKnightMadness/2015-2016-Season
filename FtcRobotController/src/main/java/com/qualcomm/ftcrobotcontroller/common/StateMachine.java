@@ -129,7 +129,7 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
         }
         if (debug) {
             Telemetry telemetry = this.opMode.telemetry;
-            if(startTime != -1){
+            if(startTime != -1 && !isRunning){
                 telemetry.addData("Starting in", (this.startTime - System.currentTimeMillis()) / 1000D);
             }
             telemetry.addData("Current State", getCurrentState().toString());
