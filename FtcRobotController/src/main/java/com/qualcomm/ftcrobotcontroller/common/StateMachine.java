@@ -32,13 +32,12 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
     private long stateAbortTime;
     private int MAX_STATE_RUN_TIME = 31 * 1000;
     private boolean debug = false;
+    private boolean finished = false;
 
     public StateMachine(Class<? extends STATE> states, OpMode opMode, long delay) {
         this.opMode = opMode;
         this.states = new LinkedList<STATE>(EnumSet.allOf(states));
         this.startTime = System.currentTimeMillis() + delay;
-        if (delay == 0)
-            start();
     }
 
     public StateMachine(STATE states, OpMode opMode, long delay) {
@@ -55,7 +54,11 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
      * @return the current state of the state machine
      */
     public STATE getCurrentState() {
-        return states.get(currentState);
+        try {
+            return states.get(currentState);
+        } catch (IndexOutOfBoundsException e){
+            return null;
+        }
     }
 
     /**
@@ -65,11 +68,18 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
      * changed by using {@link #setNextState(Enum)}
      */
     public void executeNext() {
+        if(finished)
+            return;
         int nextState = ++currentState;
-        STATE next = states.get(nextState);
+        STATE next;
+        try {
+            next = states.get(nextState);
+        } catch (IndexOutOfBoundsException e){
+            finished = true;
+            return;
+        }
         if (next == null) {
-            System.out.println("Finished executing state machine!");
-            isRunning = false;
+            isRunning = true;
             return;
         }
         Log.i("Switching to state", next.toString());
@@ -91,6 +101,7 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
             }
         } catch (Exception ignored){}
         next.runState();
+        resetHangTimer();
         if (next.shouldChangeState()) {
             next.end();
             executeNext();
@@ -105,9 +116,16 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
      * timeouts are also calculated and states are correctly aborted only when this method is called.
      */
     public void tick() {
+        if(finished) {
+            opMode.telemetry.addData("Status", "State machine finished");
+            return;
+        }
         if (startTime != -1 && !isRunning) {
             if (System.currentTimeMillis() > this.startTime)
                 start();
+        }
+        if(startTime != -1 && !isRunning){
+            opMode.telemetry.addData("Starting in", (this.startTime - System.currentTimeMillis()) / 1000D);
         }
         if (isRunning) {
             // Check if the state is hung
@@ -119,7 +137,7 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
                 System.err.println("Aborting state and halting state machine!");
                 System.err.println();
                 System.err.println("**********");
-                isRunning = false;
+                finished = true;
                 return;
             }
             getCurrentState().tick();
@@ -127,15 +145,16 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
                 getCurrentState().end();
                 executeNext();
             }
-        }
-        if (debug) {
-            Telemetry telemetry = this.opMode.telemetry;
-            if(startTime != -1 && !isRunning){
-                telemetry.addData("Starting in", (this.startTime - System.currentTimeMillis()) / 1000D);
+            if (debug) {
+                Telemetry telemetry = this.opMode.telemetry;
+                telemetry.addData("Current State", getCurrentState().toString());
+                telemetry.addData("Execution time left (s)", (this.stateAbortTime - System.currentTimeMillis()) / 1000);
             }
-            telemetry.addData("Current State", getCurrentState().toString());
-            telemetry.addData("Next State", states.get(this.currentState).toString());
-            telemetry.addData("Execution time left (s)", (this.stateAbortTime - System.currentTimeMillis()) / 1000);
+        } else {
+            if(startTime == -1){
+                Log.e("INFO", "STARTED MACHINE!");
+                start();
+            }
         }
     }
 
@@ -255,6 +274,10 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
         } catch (IllegalAccessException ignored) {
 
         }
+    }
+
+    private void resetHangTimer(){
+        this.stateAbortTime = System.currentTimeMillis() + MAX_STATE_RUN_TIME;
     }
 
     public interface State {
