@@ -5,6 +5,7 @@ import com.qualcomm.ftcrobotcontroller.common.Values;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class TreadBot extends OpMode {
 
@@ -13,9 +14,11 @@ public class TreadBot extends OpMode {
     private DcMotor right;
     private DcMotor hangArm;
     private DcMotor plow;
+    private Servo leftTriggerServo, rightTriggerServo, climberServo;
     boolean encReset = false;
     private boolean reverse = false;
     private boolean reversePressed = false;
+    private boolean climberOpen = false;
 
     @Override
     public void init() {
@@ -24,6 +27,11 @@ public class TreadBot extends OpMode {
 
         hangArm = hardwareMap.dcMotor.get("hangArm");
         plow = hardwareMap.dcMotor.get("plow");
+
+        leftTriggerServo = hardwareMap.servo.get("trigger_left");
+        rightTriggerServo = hardwareMap.servo.get("trigger_right");
+        climberServo = hardwareMap.servo.get("climber");
+        // FIXME: 12/22/15 Fix Reversing of motors
         right.setDirection(DcMotor.Direction.REVERSE);
         hangArm.setDirection(DcMotor.Direction.REVERSE);
 
@@ -43,6 +51,10 @@ public class TreadBot extends OpMode {
         left.setPower((reverse)? -gamepad1.right_stick_y : gamepad1.left_stick_y);
         right.setPower((reverse)? -gamepad1.left_stick_y : gamepad1.right_stick_y);
 
+        telemetry.addData("climberOpen", climberOpen);
+
+        telemetry.addData("rtPos", rightTriggerServo.getPosition());
+        telemetry.addData("ltPos", leftTriggerServo.getPosition());
         telemetry.addData("left_power", left.getPower());
         telemetry.addData("right_power", right.getPower());
         telemetry.addData("hangArmPos", hangArm.getCurrentPosition());
@@ -52,7 +64,8 @@ public class TreadBot extends OpMode {
         updateArm();
         updatePlow();
         updateDrive();
-
+        updateClimbers();
+        updateTrigger();
 
     }
 
@@ -111,28 +124,12 @@ public class TreadBot extends OpMode {
             plow.setTargetPosition(plow.getCurrentPosition() - plowInc);
             plow.setPower(-1);
         }
-        else if (gamepad1.right_bumper){
-            plow.setTargetPosition(plow.getCurrentPosition() + plowInc);
-            plow.setPower(1);
-        }
-        else if (gamepad1.right_trigger > 0.5) {
-            plow.setTargetPosition(plow.getCurrentPosition() - plowInc);
-            plow.setPower(-1);
-        }
         //game pad 2
         else if(gamepad2.y) {
             plow.setTargetPosition(plow.getCurrentPosition() + plowInc);
             plow.setPower(1);
         }
         else if(gamepad2.a) {
-            plow.setTargetPosition(plow.getCurrentPosition() - plowInc);
-            plow.setPower(-1);
-        }
-        else if (gamepad2.right_bumper){
-            plow.setTargetPosition(plow.getCurrentPosition() + plowInc);
-            plow.setPower(1);
-        }
-        else if (gamepad2.right_trigger > 0.5) {
             plow.setTargetPosition(plow.getCurrentPosition() - plowInc);
             plow.setPower(-1);
         }
@@ -151,6 +148,48 @@ public class TreadBot extends OpMode {
                 reversePressed = false;
             }
         }
+    }
+
+    private boolean startPressed = false;
+    private void updateClimbers(){
+        if((gamepad2.start || gamepad1.start) && !startPressed){
+            startPressed = true;
+            climberServo.setPosition(climberOpen? Values.CLIMBER_CLOSE : Values.CLIMBER_OPEN);
+            climberOpen = !climberOpen;
+        }
+        if(!(gamepad2.start || gamepad1.start)){
+            startPressed = false;
+        }
+    }
+
+    boolean p = false;
+    private void updateTrigger() {
+        // Gamepad 2
+        /*if (gamepad2.left_trigger > 0.5) {
+            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_DEPLOY);
+        } else if (gamepad2.left_bumper) {
+            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
+        }*/
+        // Mash the left/right bumper to manually adjust the servo position for the left servo
+        if(gamepad1.left_bumper && !p) {
+            p = true;
+            leftTriggerServo.setPosition(leftTriggerServo.getPosition() + 0.01);
+        }
+        if(gamepad1.right_bumper && !p){
+            p = true;
+            leftTriggerServo.setPosition(leftTriggerServo.getPosition() - .01);
+        }
+        if(gamepad1.right_trigger > 0.5 && !p){
+            p = true;
+            rightTriggerServo.setPosition(rightTriggerServo.getPosition() -.01);
+        }
+        if(gamepad1.left_trigger > 0.5 && !p){
+            p = true;
+            rightTriggerServo.setPosition(rightTriggerServo.getPosition() +.01);
+        }
+        if(!gamepad2.left_bumper && !gamepad2.right_bumper && gamepad1.left_trigger < 0.5
+                && gamepad2.right_trigger < 0.5)
+            p = false;
     }
 }
 
