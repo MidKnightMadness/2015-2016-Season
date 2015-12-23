@@ -37,6 +37,9 @@ public class TreadBot extends OpMode {
 
         hangArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
+        rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_RETRACT);
+        climberServo.setPosition(Values.CLIMBER_CLOSE);
     }
 
     @Override
@@ -94,6 +97,11 @@ public class TreadBot extends OpMode {
                 hangArm.setTargetPosition(hangArm.getCurrentPosition());
 //                hangArm.setPower(0);
             }
+        // Software "limit switch" to prevent the arm from hyper-retracting
+        if(!(gamepad1.start && gamepad1.back))
+            if(hangArm.getTargetPosition() < 0){
+                hangArm.setTargetPosition(0);
+            }
         //hang
         /*if(gamepad2.b && gamepad2.start) {
             hangArm.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
@@ -116,20 +124,20 @@ public class TreadBot extends OpMode {
         int plowInc = 200;
 
         //game pad 1
-        if (gamepad1.y) {
+        if (gamepad1.a) {
             plow.setTargetPosition(plow.getCurrentPosition() + plowInc);
             plow.setPower(1);
         }
-        else if (gamepad1.a) {
+        else if (gamepad1.x) {
             plow.setTargetPosition(plow.getCurrentPosition() - plowInc);
             plow.setPower(-1);
         }
         //game pad 2
-        else if(gamepad2.y) {
+        else if(gamepad2.a) {
             plow.setTargetPosition(plow.getCurrentPosition() + plowInc);
             plow.setPower(1);
         }
-        else if(gamepad2.a) {
+        else if(gamepad2.y) {
             plow.setTargetPosition(plow.getCurrentPosition() - plowInc);
             plow.setPower(-1);
         }
@@ -162,34 +170,33 @@ public class TreadBot extends OpMode {
         }
     }
 
-    boolean p = false;
     private void updateTrigger() {
-        // Gamepad 2
-        /*if (gamepad2.left_trigger > 0.5) {
-            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_DEPLOY);
-        } else if (gamepad2.left_bumper) {
+        // Left mountain triggers
+        if (gamepad2.left_bumper){
             leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
-        }*/
-        // Mash the left/right bumper to manually adjust the servo position for the left servo
-        if(gamepad1.left_bumper && !p) {
-            p = true;
-            leftTriggerServo.setPosition(leftTriggerServo.getPosition() + 0.01);
         }
-        if(gamepad1.right_bumper && !p){
-            p = true;
-            leftTriggerServo.setPosition(leftTriggerServo.getPosition() - .01);
+        if (gamepad2.left_trigger> 0.5){
+            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_DEPLOY);
         }
-        if(gamepad1.right_trigger > 0.5 && !p){
-            p = true;
-            rightTriggerServo.setPosition(rightTriggerServo.getPosition() -.01);
+        if(gamepad1.left_bumper){
+            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
         }
-        if(gamepad1.left_trigger > 0.5 && !p){
-            p = true;
-            rightTriggerServo.setPosition(rightTriggerServo.getPosition() +.01);
+        if (gamepad1.left_trigger > 0.5){
+            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_DEPLOY);
         }
-        if(!gamepad2.left_bumper && !gamepad2.right_bumper && gamepad1.left_trigger < 0.5
-                && gamepad2.right_trigger < 0.5)
-            p = false;
+        // Right mountain triggers
+        if (gamepad2.right_bumper){
+            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_RETRACT);
+        }
+        if (gamepad2.right_trigger> 0.5){
+            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_DEPLOY);
+        }
+        if(gamepad1.right_bumper){
+            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_RETRACT);
+        }
+        if (gamepad1.right_trigger > 0.5){
+            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_DEPLOY);
+        }
     }
 }
 
