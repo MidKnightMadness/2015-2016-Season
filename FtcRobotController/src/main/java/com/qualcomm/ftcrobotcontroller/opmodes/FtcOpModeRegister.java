@@ -77,7 +77,7 @@ public class FtcOpModeRegister implements OpModeRegister {
 //    manager.register("LinearSequentailOpMode", LinearSequential.class);
     RedBlueOpMode.register("[AUTO]FloorGoal", FloorGoal.class, manager);
     RedBlueOpMode.register("[AUTO]AutoUpMountain", AutonomousUpMountain.class, manager);
-
+    manager.register("ServoController", ManualServoOpMode.class);
    // RedBlueOpMode.register("RedBlueTest", RedBlueExample.class, manager);
     //manager.register("AdafruitRGBExample", AdafruitRGBExample.class);
     //manager.register("ColorSensorDriver", ColorSensorDriver.class);
