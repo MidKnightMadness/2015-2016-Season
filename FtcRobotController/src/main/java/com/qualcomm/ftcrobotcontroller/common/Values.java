@@ -8,7 +8,9 @@ public class Values {
     public static final int HANGARM_DEPLOY = -16000;
     public static final int HAMGARM_HANG = -3900;
 
-    public static final double CLIMBER_OPEN = 0.29803923;
+
+    //Nathan B adjusted CLIMBER_OPEN to 1 for better climber release. Original Value: 0.29803923
+    public static final double CLIMBER_OPEN = 1;
     public static final double CLIMBER_CLOSE = 0;
 
     public static final double TRIGGER_LEFT_DEPLOY = 0.105882354;

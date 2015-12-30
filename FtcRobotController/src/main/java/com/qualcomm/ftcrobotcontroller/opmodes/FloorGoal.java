@@ -97,7 +97,6 @@ public class FloorGoal extends RedBlueLinearOpMode {
         plow = hardwareMap.dcMotor.get("plow");
 
         plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
 
 
