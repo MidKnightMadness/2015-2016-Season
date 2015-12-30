@@ -148,11 +148,11 @@ public class TreadBot extends OpMode {
     }
     //toggle the driving by pressing the stick buttons
     private void updateDrive() {
-        if((gamepad1.left_stick_button || gamepad1.right_stick_button) && !reversePressed) {
+        if((gamepad1.back) && !reversePressed) {
             reverse = !reverse;
             reversePressed = true;
         } else {
-            if(!(gamepad1.left_stick_button || gamepad1.right_stick_button)){
+            if(!(gamepad1.back)){
                 reversePressed = false;
             }
         }
