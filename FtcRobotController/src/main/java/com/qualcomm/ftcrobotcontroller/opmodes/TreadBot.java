@@ -31,8 +31,8 @@ public class TreadBot extends OpMode {
         leftTriggerServo = hardwareMap.servo.get("trigger_left");
         rightTriggerServo = hardwareMap.servo.get("trigger_right");
         climberServo = hardwareMap.servo.get("climber");
-        // FIXME: 12/22/15 Fix Reversing of motors
-        right.setDirection(DcMotor.Direction.REVERSE);
+
+        left.setDirection(DcMotor.Direction.REVERSE);
         hangArm.setDirection(DcMotor.Direction.REVERSE);
 
         hangArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
@@ -146,13 +146,34 @@ public class TreadBot extends OpMode {
             plow.setPower(0);
         }
     }
-    //toggle the driving by pressing the stick buttons
+    //toggle the driving by pressing back
+    //TODO asdfkjasdhfkasjhdfkasaskdjfhaksdfhaskdjfhaksdjfhaksdjfhaksjdfhaskdjashfkjdaskdfha
+
+    /*private void updateDrive() {
+
+        int toggle = 0;
+
+        if(toggle == 0) {
+            reverse = false;
+        }
+        else if(toggle == 1) {
+            reverse = true;
+        }
+        else if (toggle > 1){
+            toggle  = 0;
+        }
+        else if (gamepad1.dpad_right)
+            toggle++;
+
+    }
+*/
+
     private void updateDrive() {
-        if((gamepad1.back) && !reversePressed) {
+        if((gamepad1.b) && !reversePressed) {
             reverse = !reverse;
             reversePressed = true;
         } else {
-            if(!(gamepad1.back)){
+            if(!(gamepad1.b)){
                 reversePressed = false;
             }
         }
@@ -169,6 +190,7 @@ public class TreadBot extends OpMode {
             startPressed = false;
         }
     }
+
 
     private void updateTrigger() {
         // Left mountain triggers
