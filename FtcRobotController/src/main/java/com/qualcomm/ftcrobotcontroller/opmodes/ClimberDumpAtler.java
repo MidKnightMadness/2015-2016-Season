@@ -2,13 +2,13 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.ftcrobotcontroller.common.GyroWorkerThread;
 import com.qualcomm.ftcrobotcontroller.common.RedBlueLinearOpMode;
-import com.qualcomm.ftcrobotcontroller.common.RedBlueOpMode;
 import com.qualcomm.ftcrobotcontroller.common.Values;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
-public class AutonomousUpMountain extends RedBlueLinearOpMode {
+public class ClimberDumpAtler extends RedBlueLinearOpMode {
 
     private DcMotor left;
     private DcMotor right;
@@ -16,6 +16,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
     private DcMotor hangArm;
     GyroSensor gyroSensor;
     GyroWorkerThread gyro;
+    Servo climberServo;
     double leftPower;
     double rightPower;
 
@@ -26,97 +27,73 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         plow = hardwareMap.dcMotor.get("plow");
         hangArm = hardwareMap.dcMotor.get("hangArm");
         left.setDirection(DcMotor.Direction.REVERSE);
+        climberServo = hardwareMap.servo.get("climber"); //changed from climberServo
         gyroSensor = this.hardwareMap.gyroSensor.get("gyro");
         gyro = new GyroWorkerThread(this, gyroSensor);
         gyro.start();
 
         waitForStart();
 
-        resetEncoders();
         resetPlowAndHangArm();
+        sleep(500);
 
-        hangArm.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        plowDown();
+        sleep(1500);
 
-        plow.setTargetPosition(Values.PLOW_DEPLOY);
-        plow.setPower(0.5);
+        resetEncoders();
+        sleep(2000);
 
-        sleep(3000);
-//        while(!(Math.abs(plow.getTargetPosition() - plow.getCurrentPosition()) < 5)){
-//            waitOneFullHardwareCycle();
-//        }
+        //driveForward(-70, -0.5);
+        driveGyroDistance(-11250, 0.5, 0);
 
-//        while(!(Math.abs(hangArm.getTargetPosition() - hangArm.getCurrentPosition()) < 5)){
-//            waitOneFullHardwareCycle();
-//        }
+        resetEncoders();
+        sleep(500);
 
-        driveGyroDistance(-10000, 0.5, 0); // was 10000, 10250, 8925, 9150, 9175
+        turnGyroDistance(-45, -0.3);
+        resetEncoders();
+        driveGyroDistance(-2000, 0.5, -45);
 
-//        hangArm.setTargetPosition(Values.HANGARM_DEPLOY);
-//        hangArm.setPower(0.5);
-//
-//        sleep(3000);
+        resetEncoders();
+        turnGyroDistance(-135, -0.3);
 
-        if(teamColor == RedBlueOpMode.TeamColor.BLUE)
-            turnGyroDistance(-90, -0.2);
-        else if(teamColor == RedBlueOpMode.TeamColor.RED)
-            turnGyroDistance(90, 0.2);
+        resetEncoders();
+        driveGyroDistance(3000, 0.5, -135);
 
-        stopMotors();
-        sleep(1000);
-
-        telemetry.addData("Gyro", gyro.heading());
-
-        if(teamColor == RedBlueOpMode.TeamColor.BLUE) // was 8000
-            driveGyroDistance(14000, 0.3, -90);
-        else if(teamColor == RedBlueOpMode.TeamColor.RED)
-            driveGyroDistance(14000, 0.3, 90);
-
-        plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        plow.setTargetPosition(Values.PLOW_RETRACT); //added this to pull up plow
-        plow.setPower(0.5);
-        int waitCount = 0;
-        while(!(Math.abs(plow.getTargetPosition() - plow.getCurrentPosition()) > 3)) {
-            telemetry.addData("WAITING", waitCount++);
-            waitOneFullHardwareCycle();
-        }
-        //sleep(3000);
 
 
     }
 
-    private void driveDistance(int distance, double power) throws InterruptedException {
-        setPos(left, 0);
-        setPos(right, 0);
-        sleep(300);
-        setPos(left, distance);
-        setPos(right, distance);
+    public void driveForward(int distance, double power) {
+
+        int MOTOR_COUNTS = 1120;
+        int GEAR_RATIO = 1;
+        double circumference = 2 * Math.PI;
+        double ROTATIONS = distance / circumference;
+        double totalDistance = MOTOR_COUNTS * ROTATIONS * GEAR_RATIO;
+
+        left.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        right.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+
+        left.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        right.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+
+        left.setTargetPosition((int) totalDistance);
+        right.setTargetPosition((int) totalDistance);
+
         left.setPower(power);
         right.setPower(power);
-        int abortTime = 0;
-        while(abortTime < 4500) {
-            telemetry.addData("Left", left.getCurrentPosition());
-            telemetry.addData("Right", right.getCurrentPosition());
-            telemetry.addData("LT", left.getTargetPosition());
-            telemetry.addData("RT", right.getTargetPosition());
-            telemetry.addData("time", abortTime);
-            waitOneFullHardwareCycle();
-            sleep(10);
-            abortTime += 10;
-        }
-        resetEncoders();
-        waitOneFullHardwareCycle();
-        sleep(500);
-        stopMotors();
+
+        telemetry.addData("Power: ", power);
     }
 
-    private void turnDistance(int distance, double power) throws InterruptedException{
+
+    private void turnDistance(int distance, double power) throws InterruptedException {
         setPos(left, distance);
         setPos(right, -distance);
         left.setPower(power);
         right.setPower(power);
         int abortTime = 0;
-        while(abortTime < 4500) {
+        while (abortTime < 4500) {
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LT", left.getTargetPosition());
@@ -136,7 +113,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         right.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         left.setPower(power);
         right.setPower(-power);
-        while(Math.abs(gyro.heading()) < Math.abs(target)) {
+        while (Math.abs(gyro.heading()) < Math.abs(target)) {
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LeftPower", left.getPower());
@@ -145,7 +122,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
             left.setPower(power);
             right.setPower(-power);
 
-            if(Math.abs(gyro.heading() - (target)) < 20) {
+            if (Math.abs(gyro.heading() - (target)) < 20) {
                 left.setPower(power - 0.15);
                 right.setPower(-(power - 0.15));
             }
@@ -158,46 +135,23 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         stopMotors();
     }
 
-    private void driveGyroDistance(int distance, double power, int target) throws InterruptedException {
-        setPos(left, distance);
-        setPos(right, distance);
-        left.setPower(power);
-        right.setPower(power);
-        int abortTime = 0;
-        while(abortTime < 8000) { //4500 not enough
-            telemetry.addData("Left", left.getCurrentPosition());
-            telemetry.addData("Right", right.getCurrentPosition());
-            telemetry.addData("LeftPower", left.getPower());
-            telemetry.addData("RightPower", right.getPower());
-            sleep(10);
-            abortTime += 10;
-
-            if(distance > 0) {
-                leftPower = power - (gyro.heading() - target) / 200;
-                rightPower = power + (gyro.heading() - target) / 200;
-            } else {
-                leftPower = power + (gyro.heading() - target) / 200;
-                rightPower = power - (gyro.heading() - target) / 200;
-            }
-
-            if(leftPower > 0.5)
-                leftPower = 0.5;
-            else if(leftPower < 0.1)
-                leftPower = 0.1;
-            left.setPower(leftPower);
-
-            if(rightPower > 0.5)
-                rightPower = 0.5;
-            else if(rightPower < 0.1)
-                rightPower = 0.1;
-            right.setPower(rightPower);
+    public void plowDown() {
 
 
-        }
-        resetEncoders();
-        waitOneFullHardwareCycle();
-        sleep(500);
-        stopMotors();
+        plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+
+        plow.setTargetPosition(Values.PLOW_DEPLOY);
+        plow.setPower(0.5);
+
+    }
+
+    public void plowUp() {
+
+        plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+
+        plow.setTargetPosition(Values.PLOW_RETRACT);
+        plow.setPower(-1);
+
     }
 
     private void resetEncoders() {
@@ -210,7 +164,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
     }
 
-    private void setPos(DcMotor motor, int pos){
+    private void setPos(DcMotor motor, int pos) {
         motor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         motor.setTargetPosition(pos);
     }
@@ -220,4 +174,41 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         right.setPower(0);
     }
 
+    private void driveGyroDistance(int distance, double power, int target) throws InterruptedException {
+        setPos(left, distance);
+        setPos(right, distance);
+        left.setPower(power);
+        right.setPower(power);
+        int abortTime = 0;
+        while (abortTime < 8000) { //4500 not enough
+            telemetry.addData("Left", left.getCurrentPosition());
+            telemetry.addData("Right", right.getCurrentPosition());
+            telemetry.addData("LeftPower", left.getPower());
+            telemetry.addData("RightPower", right.getPower());
+            sleep(10);
+            abortTime += 10;
+
+            if (distance > 0) {
+                leftPower = power - (gyro.heading() - target) / 200;
+                rightPower = power + (gyro.heading() - target) / 200;
+            } else {
+                leftPower = power + (gyro.heading() - target) / 200;
+                rightPower = power - (gyro.heading() - target) / 200;
+            }
+
+            if (leftPower > 0.5)
+                leftPower = 0.5;
+            else if (leftPower < 0.1)
+                leftPower = 0.1;
+            left.setPower(leftPower);
+
+            if (rightPower > 0.5)
+                rightPower = 0.5;
+            else if (rightPower < 0.1)
+                rightPower = 0.1;
+            right.setPower(rightPower);
+
+
+        }
+    }
 }
