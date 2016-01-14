@@ -32,7 +32,7 @@ public class TreadBot extends OpMode {
         rightTriggerServo = hardwareMap.servo.get("trigger_right");
         climberServo = hardwareMap.servo.get("climber");
 
-        left.setDirection(DcMotor.Direction.REVERSE);
+        right.setDirection(DcMotor.Direction.REVERSE);
         hangArm.setDirection(DcMotor.Direction.REVERSE);
 
         hangArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
