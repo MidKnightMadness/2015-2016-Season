@@ -147,7 +147,8 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
             }
             if (debug) {
                 Telemetry telemetry = this.opMode.telemetry;
-                telemetry.addData("Current State", getCurrentState().toString());
+                if(getCurrentState() != null)
+                    telemetry.addData("Current State", getCurrentState().toString());
                 telemetry.addData("Execution time left (s)", (this.stateAbortTime - System.currentTimeMillis()) / 1000);
             }
         } else {
