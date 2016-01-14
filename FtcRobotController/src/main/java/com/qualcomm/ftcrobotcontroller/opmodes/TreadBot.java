@@ -98,10 +98,6 @@ public class TreadBot extends OpMode {
 //                hangArm.setPower(0);
             }
         // Software "limit switch" to prevent the arm from hyper-retracting
-        if(!(gamepad1.start && gamepad1.back))
-            if(hangArm.getTargetPosition() < 0){
-                hangArm.setTargetPosition(0);
-            }
         //hang
         /*if(gamepad2.b && gamepad2.start) {
             hangArm.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
