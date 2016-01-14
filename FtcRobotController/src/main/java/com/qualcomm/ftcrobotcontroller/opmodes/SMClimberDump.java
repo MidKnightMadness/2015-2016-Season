@@ -118,7 +118,7 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public boolean shouldChangeState() {
-                if (Math.abs(parent.hangArm.getCurrentPosition() - parent.hangArm.getTargetPosition()) < 3)
+                if (Math.abs(parent.hangArm.getCurrentPosition() - Values.HANGARM_DEPLOY) < 3)
                     return true; //True too soon? Advancing too soon?
                 else
                     return false;
