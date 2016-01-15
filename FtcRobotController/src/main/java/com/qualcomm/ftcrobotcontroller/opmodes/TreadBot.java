@@ -14,7 +14,9 @@ public class TreadBot extends OpMode {
     private DcMotor right;
     private DcMotor hangArm;
     private DcMotor plow;
+
     private Servo leftTriggerServo, rightTriggerServo, climberServo;
+
     boolean encReset = false;
     private boolean reverse = false;
     private boolean reversePressed = false;
@@ -24,7 +26,6 @@ public class TreadBot extends OpMode {
     public void init() {
         left = hardwareMap.dcMotor.get("left");
         right = hardwareMap.dcMotor.get("right");
-
         hangArm = hardwareMap.dcMotor.get("hangArm");
         plow = hardwareMap.dcMotor.get("plow");
 
@@ -32,11 +33,14 @@ public class TreadBot extends OpMode {
         rightTriggerServo = hardwareMap.servo.get("trigger_right");
         climberServo = hardwareMap.servo.get("climber");
 
+        left.setDirection(DcMotor.Direction.FORWARD);
         right.setDirection(DcMotor.Direction.REVERSE);
+        plow.setDirection(DcMotor.Direction.FORWARD);
         hangArm.setDirection(DcMotor.Direction.REVERSE);
 
         hangArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+
         leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
         rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_RETRACT);
         climberServo.setPosition(Values.CLIMBER_CLOSE);
@@ -51,8 +55,9 @@ public class TreadBot extends OpMode {
         }
 
 
-        left.setPower((reverse)? -gamepad1.right_stick_y : gamepad1.left_stick_y);
-        right.setPower((reverse)? -gamepad1.left_stick_y : gamepad1.right_stick_y);
+        // Hours spent: 2
+        right.setPower((reverse)? -gamepad1.right_stick_y : gamepad1.left_stick_y);
+        left.setPower((reverse)? -gamepad1.left_stick_y : gamepad1.right_stick_y);
 
         telemetry.addData("climberOpen", climberOpen);
 

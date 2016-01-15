@@ -17,6 +17,7 @@ public class SMClimberDump extends RedBlueOpMode {
     private DcMotor left;
     private DcMotor right;
     private DcMotor hangArm;
+    private DcMotor plow;
 
     Servo climberServo;
 
@@ -26,10 +27,15 @@ public class SMClimberDump extends RedBlueOpMode {
 
         left = hardwareMap.dcMotor.get("left");
         right = hardwareMap.dcMotor.get("right");
-        right.setDirection(DcMotor.Direction.REVERSE);
+        plow = hardwareMap.dcMotor.get("plow");
         hangArm = hardwareMap.dcMotor.get("hangArm");
 
         climberServo = hardwareMap.servo.get("climber");
+
+        left.setDirection(DcMotor.Direction.FORWARD);
+        right.setDirection(DcMotor.Direction.REVERSE);
+        hangArm.setDirection(DcMotor.Direction.FORWARD);
+        plow.setDirection(DcMotor.Direction.FORWARD);
 
         stateMachine = new StateMachine<States>(States.INIT, this);
         stateMachine.enableDebug();
