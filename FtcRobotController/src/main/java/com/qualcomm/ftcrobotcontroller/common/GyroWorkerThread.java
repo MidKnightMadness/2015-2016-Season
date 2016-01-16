@@ -57,6 +57,10 @@ public class GyroWorkerThread extends Thread{
         return this.heading - this.offsetHeading;
     }
 
+    public synchronized double absoluteHeading(){
+        return this.heading;
+    }
+
     public synchronized void calibrate(){
         this.heading = 0;
         this.calib = 0;
