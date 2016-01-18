@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 public class TreadBot extends OpMode {
 
@@ -18,7 +19,7 @@ public class TreadBot extends OpMode {
     private Servo leftTriggerServo, rightTriggerServo, climberServo;
 
     boolean encReset = false;
-    private boolean reverse = false;
+    private boolean reverse = true;
     private boolean reversePressed = false;
     private boolean climberOpen = false;
 
@@ -69,6 +70,8 @@ public class TreadBot extends OpMode {
         telemetry.addData("plowPos", plow.getCurrentPosition());
         telemetry.addData("rightBumper", gamepad1.right_trigger);
         telemetry.addData("reverse", reverse);
+        telemetry.addData("joy1Next", nextJoy1);
+        telemetry.addData("joy2Next", nextJoy2);
         updateArm();
         updatePlow();
         updateDrive();
@@ -138,7 +141,7 @@ public class TreadBot extends OpMode {
             plow.setTargetPosition(plow.getCurrentPosition() + plowInc);
             plow.setPower(1);
         }
-        else if(gamepad2.y) {
+        else if(gamepad2.x) {
             plow.setTargetPosition(plow.getCurrentPosition() - plowInc);
             plow.setPower(-1);
         }
@@ -193,33 +196,61 @@ public class TreadBot extends OpMode {
     }
 
 
+    private final double updateFreq = 1000;
+    private final int updateMs = (int) Math.floor(1000 / updateFreq);
+    private long nextJoy1;
+    private long nextJoy2;
+
+    private final double servoInc = 0.01;
+    private boolean timeExpired(boolean joy1){
+        if(System.currentTimeMillis() > (joy1? nextJoy1 : nextJoy2)){
+            if(joy1){
+                nextJoy1 = System.currentTimeMillis() + updateMs;
+                return true;
+            } else {
+                nextJoy2 = System.currentTimeMillis() + updateMs;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void addServoPos(Servo servo, double servoPos){
+        double newPos = Range.clip(servo.getPosition() - servoPos, 0, 1);
+        servo.setPosition(newPos);
+    }
+
     private void updateTrigger() {
         // Left mountain triggers
         if (gamepad2.left_bumper){
-            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
-        }
-        if (gamepad2.left_trigger> 0.5){
-            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_DEPLOY);
+            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_RETRACT);
         }
         if(gamepad1.left_bumper){
-            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
-        }
-        if (gamepad1.left_trigger > 0.5){
-            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_DEPLOY);
+            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_RETRACT);
         }
         // Right mountain triggers
         if (gamepad2.right_bumper){
-            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_RETRACT);
-        }
-        if (gamepad2.right_trigger> 0.5){
-            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_DEPLOY);
+            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
         }
         if(gamepad1.right_bumper){
-            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_RETRACT);
+            leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
         }
-        if (gamepad1.right_trigger > 0.5){
-            rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_DEPLOY);
+
+        if(gamepad2.left_trigger > 0.5){
+            if(timeExpired(false))
+                addServoPos(rightTriggerServo, servoInc);
         }
+        if(gamepad1.left_trigger > 0.5){
+            if(timeExpired(true))
+                addServoPos(rightTriggerServo, servoInc);
+        }
+        if(gamepad2.right_trigger > 0.5){
+            if(timeExpired(false))
+                addServoPos(leftTriggerServo, -servoInc);
+        }
+        if(gamepad1.right_trigger > 0.5)
+            if(timeExpired(true))
+                addServoPos(leftTriggerServo, -servoInc);
     }
 }
 
