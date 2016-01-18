@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.robocol.Telemetry;
 
 import java.nio.channels.DatagramChannel;
 
@@ -73,8 +74,6 @@ public class SMClimberDump extends RedBlueOpMode {
         telemetry.addData("Right", right.getCurrentPosition());
         telemetry.addData("LeftPower", left.getPower());
         telemetry.addData("RightPower", right.getPower());
-        Log.i("[B] left_power", Double.toString(leftPower));
-        Log.i("[B] right_power", Double.toString(rightPower));
         if (distance > 0) {
             leftPower = power - (gyro.heading() - target) / 200;
             rightPower = power + (gyro.heading() - target) / 200;
@@ -91,8 +90,8 @@ public class SMClimberDump extends RedBlueOpMode {
                 rightPower = 0.1;
             right.setPower(rightPower);
         } else {
-            leftPower = power + (gyro.heading() - target) / 200;
-            rightPower = power - (gyro.heading() - target) / 200;
+            leftPower = power - (gyro.heading() - target) / 200;
+            rightPower = power + (gyro.heading() - target) / 200;
 
             if (leftPower < -0.6)
                 leftPower = -0.6;
@@ -106,11 +105,6 @@ public class SMClimberDump extends RedBlueOpMode {
                 rightPower = -0.1;
             right.setPower(rightPower);
         }
-
-
-        Log.i("left_power", Double.toString(leftPower));
-        Log.i("right_power", Double.toString(rightPower));
-
 
     }
 
@@ -219,10 +213,11 @@ public class SMClimberDump extends RedBlueOpMode {
         },
         DRIVE_BACK_1 {
             SMClimberDump parent;
-
             @Override
             public boolean shouldChangeState() {
-                if ((Math.abs(parent.left.getCurrentPosition() - parent.distance) < 3) && (Math.abs(parent.right.getCurrentPosition() - parent.distance) < 3))
+                int leftTarget = Math.abs(parent.left.getCurrentPosition() - parent.distance);
+                int rightTarget = Math.abs(parent.right.getCurrentPosition() - parent.distance);
+                if ((leftTarget < 3) && rightTarget < 3)
                     return true;
                 else
                     return false;
@@ -231,7 +226,7 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public void runState() {
-                parent.driveGyroDistance(-18000, -0.4, 0);
+                parent.driveGyroDistance(-7650, -0.4, 0);
                 parent.left.setTargetPosition(parent.distance);
                 parent.right.setTargetPosition(parent.distance);
             }
@@ -279,7 +274,7 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public void runState() {
-                parent.turnGyroDistance(-135, -0.3);
+                parent.turnGyroDistance(45, 0.3);
             }
 
             @Override
@@ -296,10 +291,6 @@ public class SMClimberDump extends RedBlueOpMode {
 
 
         },
-
-
-
-
         DRIVE_FORWARD {
             SMClimberDump parent;
 
@@ -314,8 +305,7 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public void runState() {
-
-                parent.driveGyroDistance(1000, 0.3, 0);
+                parent.driveGyroDistance(-16130, -0.3, 0);
                 parent.left.setTargetPosition(parent.distance);
                 parent.right.setTargetPosition(parent.distance);
             }
@@ -328,6 +318,30 @@ public class SMClimberDump extends RedBlueOpMode {
             @Override
             public void tick() {
                 parent.updateGyro();
+            }
+        },
+        TURN_2{
+            SMClimberDump parent;
+            @Override
+            public boolean shouldChangeState() {
+                return parent.hasTurnCompleted();
+            }
+
+            @Override
+            public void runState() {
+                parent.turnGyroDistance(135, 0.3);
+            }
+
+            @Override
+            public void end() {
+                parent.stopMotors();
+                parent.setRunToPosition();
+                parent.resetEncoders();
+            }
+
+            @Override
+            public void tick() {
+
             }
         },
         HANGARM_DEPLOY {
