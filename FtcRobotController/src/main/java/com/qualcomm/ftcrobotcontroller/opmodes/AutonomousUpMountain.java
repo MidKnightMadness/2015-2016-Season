@@ -25,7 +25,10 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         right = hardwareMap.dcMotor.get("right");
         plow = hardwareMap.dcMotor.get("plow");
         hangArm = hardwareMap.dcMotor.get("hangArm");
-        left.setDirection(DcMotor.Direction.REVERSE);
+        right.setDirection(DcMotor.Direction.REVERSE);
+        left.setDirection(DcMotor.Direction.FORWARD);
+        plow.setDirection(DcMotor.Direction.FORWARD);
+        hangArm.setDirection(DcMotor.Direction.FORWARD);
         gyroSensor = this.hardwareMap.gyroSensor.get("gyro");
         gyro = new GyroWorkerThread(this, gyroSensor);
         gyro.start();
@@ -50,13 +53,18 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
 //            waitOneFullHardwareCycle();
 //        }
 
-        driveGyroDistance(-10000, 0.5, 0); // was 10000, 10250, 8925, 9150, 9175
+        driveGyroDistance(-19000, 0.5, 0); // was 10000, 10250, 8925, 9150, 9175
 
 //        hangArm.setTargetPosition(Values.HANGARM_DEPLOY);
 //        hangArm.setPower(0.5);
 //
 //        sleep(3000);
 
+
+        plow.setTargetPosition(Values.PLOW_RETRACT);
+        plow.setPower(0.5);
+
+        sleep(3000);
         if(teamColor == RedBlueOpMode.TeamColor.BLUE)
             turnGyroDistance(-90, -0.2);
         else if(teamColor == RedBlueOpMode.TeamColor.RED)
