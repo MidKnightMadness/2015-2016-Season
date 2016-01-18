@@ -140,10 +140,12 @@ public class StateMachine<STATE extends Enum & StateMachine.State> {
                 finished = true;
                 return;
             }
-            getCurrentState().tick();
-            if (getCurrentState().shouldChangeState()) {
-                getCurrentState().end();
-                executeNext();
+            if(getCurrentState() != null) {
+                getCurrentState().tick();
+                if (getCurrentState().shouldChangeState()) {
+                    getCurrentState().end();
+                    executeNext();
+                }
             }
             if (debug) {
                 Telemetry telemetry = this.opMode.telemetry;
