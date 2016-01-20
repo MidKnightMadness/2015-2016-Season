@@ -65,13 +65,13 @@ public class ResetPlowAndArm extends OpMode {
             @Override
             public boolean shouldChangeState() {
                 Log.w("arm_pos", Integer.toString(parent.arm.getCurrentPosition()));
-                return Math.abs(parent.arm.getCurrentPosition() - 600) < 10;
+                return Math.abs(parent.arm.getCurrentPosition() - 450) < 10;
             }
 
             @Override
             public void runState() {
                 Log.w("arm_start_pos", parent.arm.getCurrentPosition() + "");
-                parent.arm.setTargetPosition(600);
+                parent.arm.setTargetPosition(450);
                 parent.arm.setPower(1);
             }
 
