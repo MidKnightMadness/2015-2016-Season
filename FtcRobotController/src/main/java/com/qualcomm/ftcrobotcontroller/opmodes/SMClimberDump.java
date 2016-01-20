@@ -66,6 +66,12 @@ public class SMClimberDump extends RedBlueOpMode {
     @Override
     public void loop() {
         stateMachine.tick();
+        telemetry.addData("left_motor_power", left.getPower());
+        telemetry.addData("right_motor_power", right.getPower());
+        telemetry.addData("left_target", left.getTargetPosition());
+        telemetry.addData("left_curr", left.getCurrentPosition());
+        telemetry.addData("right_curr", right.getCurrentPosition());
+        telemetry.addData("right_target", right.getTargetPosition());
     }
 
     private void updateGyro() {
@@ -128,6 +134,14 @@ public class SMClimberDump extends RedBlueOpMode {
         return Math.abs(gyro.heading() - this.turnTarget) < 3;
     }
 
+    private void driveWithoutGyro(int distance, double power){
+        this.setRunToPosition();
+        this.distance = distance;
+        this.left.setTargetPosition(distance);
+        this.right.setTargetPosition(distance);
+        this.left.setPower(power);
+        this.right.setPower(power);
+    }
 
     private void setPos(DcMotor motor, int pos) {
         motor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
@@ -240,30 +254,7 @@ public class SMClimberDump extends RedBlueOpMode {
             public void tick() {
                 parent.updateGyro();
             }
-        },/*
-        GYRO_CALIBRATE {
-            SMClimberDump parent;
-
-            @Override
-            public boolean shouldChangeState() {
-                return !parent.gyro.isCalibrating();
-            }
-
-            @Override
-            public void runState() {
-                parent.gyro.calibrate();
-            }
-
-            @Override
-            public void end() {
-
-            }
-
-            @Override
-            public void tick() {
-
-            }
-        },*/
+        },
         TURN_1 {
             SMClimberDump parent;
 
@@ -300,14 +291,14 @@ public class SMClimberDump extends RedBlueOpMode {
                     return true;
                 else
                     return false;
-
             }
 
             @Override
             public void runState() {
-                parent.driveGyroDistance(-16130, -0.3, 0);
-                parent.left.setTargetPosition(parent.distance);
-                parent.right.setTargetPosition(parent.distance);
+                parent.driveWithoutGyro(-16130, -0.3);
+//                parent.driveGyroDistance(-16130, -0.3, 0);
+//                parent.left.setTargetPosition(parent.distance);
+//                parent.right.setTargetPosition(parent.distance);
             }
 
             @Override
@@ -317,7 +308,7 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public void tick() {
-                parent.updateGyro();
+//                parent.updateGyro();
             }
         },
         TURN_2{
