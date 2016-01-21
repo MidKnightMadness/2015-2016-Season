@@ -202,6 +202,8 @@ public class SMClimberDump extends RedBlueOpMode {
             }
         },
         PLOW_DOWN {
+            SMClimberDump parent;
+
             @Override
             public boolean shouldChangeState() {
                 return Math.abs(parent.plow.getCurrentPosition() - Values.PLOW_DEPLOY) < 3;
@@ -223,7 +225,7 @@ public class SMClimberDump extends RedBlueOpMode {
                 parent.telemetry.addData("Plow", parent.plow.getCurrentPosition());
             }
 
-            SMClimberDump parent;
+
         },
         DRIVE_BACK_1 {
             SMClimberDump parent;
@@ -240,7 +242,7 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public void runState() {
-                parent.driveGyroDistance(-7650, -0.4, 0);
+                parent.driveGyroDistance(-7000, -0.4, 0); //was -7650
                 parent.left.setTargetPosition(parent.distance);
                 parent.right.setTargetPosition(parent.distance);
             }
@@ -265,7 +267,7 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public void runState() {
-                parent.turnGyroDistance(45, 0.3);
+                parent.turnGyroDistance(49/*'ers*/, 0.3); //was 45 degrees
             }
 
             @Override
@@ -287,7 +289,13 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public boolean shouldChangeState() {
-                if ((Math.abs(parent.left.getCurrentPosition() - parent.distance) < 3) && (Math.abs(parent.right.getCurrentPosition() - parent.distance) < 3))
+                boolean leftReached = Math.abs(parent.left.getCurrentPosition() - parent.distance) < 3;
+                boolean rightReached = Math.abs(parent.right.getCurrentPosition() - parent.distance) < 3;
+                if(leftReached)
+                    parent.left.setPower(0);
+                if(rightReached)
+                    parent.right.setPower(0);
+                if (leftReached) //&& rightReached)
                     return true;
                 else
                     return false;
@@ -295,7 +303,7 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public void runState() {
-                parent.driveWithoutGyro(-16130, -0.3);
+                parent.driveWithoutGyro(-24500, -0.6); //was -16130, -0.3
 //                parent.driveGyroDistance(-16130, -0.3, 0);
 //                parent.left.setTargetPosition(parent.distance);
 //                parent.right.setTargetPosition(parent.distance);
@@ -320,7 +328,7 @@ public class SMClimberDump extends RedBlueOpMode {
 
             @Override
             public void runState() {
-                parent.turnGyroDistance(135, 0.3);
+                parent.turnGyroDistance(-90, -0.3);
             }
 
             @Override
@@ -334,6 +342,64 @@ public class SMClimberDump extends RedBlueOpMode {
             public void tick() {
 
             }
+        },
+        RESET_DRIVE_ENCODERS {
+            SMClimberDump parent;
+
+            @Override
+            public boolean shouldChangeState() {
+                return parent.haveEncodersReset();
+            }
+
+            @Override
+            public void runState() {
+                parent.resetEncoders();
+            }
+
+            @Override
+            public void end() {
+                parent.setRunToPosition();
+            }
+
+            @Override
+            public void tick() {
+
+            }
+        },
+        DRIVE_TO_GOAL {
+            SMClimberDump parent;
+
+            @Override
+            public boolean shouldChangeState() {
+                boolean leftReached = Math.abs(parent.left.getCurrentPosition() - parent.distance) < 3;
+                boolean rightReached = Math.abs(parent.right.getCurrentPosition() - parent.distance) < 3;
+                if(leftReached)
+                    parent.left.setPower(0);
+                if(rightReached)
+                    parent.right.setPower(0);
+                if (leftReached) //&& rightReached)
+                    return true;
+                else
+                    return false;
+            }
+
+            @Override
+            public void runState() {
+                parent.driveWithoutGyro(6500, 0.4);
+            }
+
+            @Override
+            public void end() {
+                parent.stopMotors();
+            }
+
+            @Override
+            public void tick() {
+
+            }
+
+
+
         },
         HANGARM_DEPLOY {
             SMClimberDump parent;
