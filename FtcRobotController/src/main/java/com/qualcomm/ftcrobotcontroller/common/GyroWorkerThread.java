@@ -9,6 +9,7 @@ public class GyroWorkerThread extends Thread{
     private OpMode parent;
     private boolean running = true;
     private double heading;
+    private double offsetHeading;
     private double calibration;
     private double calib;
     private State state = State.UNKNOWN;
@@ -53,6 +54,10 @@ public class GyroWorkerThread extends Thread{
     }
 
     public synchronized double heading(){
+        return this.heading - this.offsetHeading;
+    }
+
+    public synchronized double absoluteHeading(){
         return this.heading;
     }
 
@@ -62,6 +67,10 @@ public class GyroWorkerThread extends Thread{
         this.calibrationRuns = 0;
         this.calibration = 0;
         this.state = State.CALIBRATING;
+    }
+
+    public synchronized void reset(){
+        this.offsetHeading = this.heading;
     }
 
     public synchronized boolean isCalibrating(){

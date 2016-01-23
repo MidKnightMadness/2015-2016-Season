@@ -25,7 +25,10 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         right = hardwareMap.dcMotor.get("right");
         plow = hardwareMap.dcMotor.get("plow");
         hangArm = hardwareMap.dcMotor.get("hangArm");
-        left.setDirection(DcMotor.Direction.REVERSE);
+        right.setDirection(DcMotor.Direction.REVERSE);
+        left.setDirection(DcMotor.Direction.FORWARD);
+        plow.setDirection(DcMotor.Direction.FORWARD);
+        hangArm.setDirection(DcMotor.Direction.FORWARD);
         gyroSensor = this.hardwareMap.gyroSensor.get("gyro");
         gyro = new GyroWorkerThread(this, gyroSensor);
         gyro.start();
@@ -33,6 +36,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         waitForStart();
 
         resetEncoders();
+        resetPlowAndHangArm();
 
         hangArm.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
@@ -49,13 +53,18 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
 //            waitOneFullHardwareCycle();
 //        }
 
-        driveGyroDistance(-10250, 0.5, 0); // was 10000
+        driveGyroDistance(-19000, 0.5, 0); // was 10000, 10250, 8925, 9150, 9175
 
 //        hangArm.setTargetPosition(Values.HANGARM_DEPLOY);
 //        hangArm.setPower(0.5);
 //
 //        sleep(3000);
 
+
+        plow.setTargetPosition(Values.PLOW_RETRACT);
+        plow.setPower(0.5);
+
+        sleep(3000);
         if(teamColor == RedBlueOpMode.TeamColor.BLUE)
             turnGyroDistance(-90, -0.2);
         else if(teamColor == RedBlueOpMode.TeamColor.RED)
@@ -66,14 +75,20 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
 
         telemetry.addData("Gyro", gyro.heading());
 
-        if(teamColor == RedBlueOpMode.TeamColor.BLUE) // was 8000, increasing slightly
-            driveGyroDistance(13000, 0.3, -90);
+        if(teamColor == RedBlueOpMode.TeamColor.BLUE) // was 8000
+            driveGyroDistance(14000, 0.3, -90);
         else if(teamColor == RedBlueOpMode.TeamColor.RED)
-            driveGyroDistance(13000, 0.3, 90);
+            driveGyroDistance(14000, 0.3, 90);
 
+        plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         plow.setTargetPosition(Values.PLOW_RETRACT); //added this to pull up plow
         plow.setPower(0.5);
-        sleep(3000);
+        int waitCount = 0;
+        while(!(Math.abs(plow.getTargetPosition() - plow.getCurrentPosition()) > 3)) {
+            telemetry.addData("WAITING", waitCount++);
+            waitOneFullHardwareCycle();
+        }
+        //sleep(3000);
 
 
     }
@@ -138,7 +153,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
             left.setPower(power);
             right.setPower(-power);
 
-            if(Math.abs(gyro.heading() - (target)) < 10) {
+            if(Math.abs(gyro.heading() - (target)) < 20) {
                 left.setPower(power - 0.15);
                 right.setPower(-(power - 0.15));
             }
@@ -157,7 +172,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         left.setPower(power);
         right.setPower(power);
         int abortTime = 0;
-        while(abortTime < 6500) { //4500 not enough
+        while(abortTime < 8000) { //4500 not enough
             telemetry.addData("Left", left.getCurrentPosition());
             telemetry.addData("Right", right.getCurrentPosition());
             telemetry.addData("LeftPower", left.getPower());
@@ -196,7 +211,9 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
     private void resetEncoders() {
         left.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         right.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+    }
 
+    private void resetPlowAndHangArm() {
         hangArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
     }

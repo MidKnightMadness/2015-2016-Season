@@ -97,7 +97,6 @@ public class FloorGoal extends RedBlueLinearOpMode {
         plow = hardwareMap.dcMotor.get("plow");
 
         plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
 
 
@@ -110,17 +109,11 @@ public class FloorGoal extends RedBlueLinearOpMode {
         plowDown();
         sleep(1500);
 
-        driveForward(-70, -0.5);
+        driveForward(-80, -0.5);
         sleep(10000);
 
         plowUp();
         sleep(2500);
 
-        //distance, left Power, right Power
-        if(teamColor == RedBlueOpMode.TeamColor.BLUE)
-            turn(-24, 0, -0.75);
-        else if(teamColor == RedBlueOpMode.TeamColor.RED)
-            turn(-24, -0.75, 0);
-        sleep(4000);
     }
 }
