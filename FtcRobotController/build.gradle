@@ -37,7 +37,7 @@ allprojects {
 }
 
 dependencies {
-    compile files('libs/android-support-v4.jar')
+    compile "com.android.support:support-v4:19.0.+"
     compile(name: 'RobotCore-release', ext: 'aar')
     compile(name: 'Hardware-release', ext: 'aar')
     compile(name: 'FtcCommon-release', ext: 'aar')
