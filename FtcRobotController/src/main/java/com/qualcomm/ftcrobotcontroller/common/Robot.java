@@ -220,6 +220,11 @@ public class Robot extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        parent.telemetry.addData("Joystick 1 Left (X,Y): ", parent.gamepad1.left_stick_x+", "+parent.gamepad1.left_stick_y);
+        parent.telemetry.addData("Joystick 1 Right (X,Y): ", parent.gamepad1.right_stick_x+", "+parent.gamepad1.right_stick_y);
+        parent.telemetry.addData("Joystick 2 Left (X,Y): ", parent.gamepad2.left_stick_x+", "+parent.gamepad2.left_stick_y);
+        parent.telemetry.addData("Joystick 2 Right (X,Y): ", parent.gamepad2.right_stick_x+", "+parent.gamepad2.right_stick_y);
+
     }
 
     @Override
