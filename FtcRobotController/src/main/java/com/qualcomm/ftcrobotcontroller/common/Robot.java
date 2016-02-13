@@ -32,6 +32,8 @@ public class Robot extends Thread {
     private double power;
     private double gyroTarget;
     private boolean driveBackwards;
+    private int leftTarget;
+    private int rightTarget;
 
     private static final int TICKS_TO_CM = 89;
 
@@ -71,6 +73,8 @@ public class Robot extends Thread {
         // All relative
         drive_left.setTargetPosition(drive_left.getCurrentPosition() + distance);
         drive_right.setTargetPosition(drive_right.getCurrentPosition() + distance);
+        leftTarget = drive_left.getTargetPosition();
+        rightTarget = drive_right.getTargetPosition();
         drive_left.setPower(power);
         drive_right.setPower(power);
     }
@@ -105,8 +109,8 @@ public class Robot extends Thread {
     public boolean movementComplete() {
         switch (driveMode) {
             case DRIVE:
-                return Math.abs(drive_left.getTargetPosition() - drive_left.getCurrentPosition()) < 20 &&
-                        Math.abs(drive_right.getTargetPosition() - drive_left.getCurrentPosition()) < 20;
+                return Math.abs(leftTarget- drive_left.getCurrentPosition()) < 20 &&
+                        Math.abs(rightTarget - drive_left.getCurrentPosition()) < 20;
             case TURN:
                 return Math.abs(gyroThread.heading() - gyroTarget) < 3;
             default:
@@ -153,11 +157,15 @@ public class Robot extends Thread {
     }
 
     public void deployPlow(){
+        plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         plow.setTargetPosition(Values.PLOW_DEPLOY);
+        plow.setPower(1);
     }
 
     public void retractPlow(){
+        plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         plow.setTargetPosition(Values.PLOW_RETRACT);
+        plow.setPower(1);
     }
 
     private void update() {
@@ -220,11 +228,13 @@ public class Robot extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if(driveMode != null)
+            parent.telemetry.addData("Mode", driveMode.toString());
         parent.telemetry.addData("Joystick 1 Left (X,Y): ", parent.gamepad1.left_stick_x+", "+parent.gamepad1.left_stick_y);
         parent.telemetry.addData("Joystick 1 Right (X,Y): ", parent.gamepad1.right_stick_x+", "+parent.gamepad1.right_stick_y);
         parent.telemetry.addData("Joystick 2 Left (X,Y): ", parent.gamepad2.left_stick_x+", "+parent.gamepad2.left_stick_y);
         parent.telemetry.addData("Joystick 2 Right (X,Y): ", parent.gamepad2.right_stick_x+", "+parent.gamepad2.right_stick_y);
-
+        parent.telemetry.addData("righttarget, lefttarget", leftTarget +","+rightTarget);
     }
 
     @Override
