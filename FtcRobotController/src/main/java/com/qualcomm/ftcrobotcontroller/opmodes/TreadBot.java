@@ -1,10 +1,10 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 
+import com.qualcomm.ftcrobotcontroller.common.Robot;
 import com.qualcomm.ftcrobotcontroller.common.Values;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -13,6 +13,7 @@ public class TreadBot extends OpMode {
 
     private final double updateFreq = 1000;
     private final double servoInc = 0.01;
+    private Robot robot;
 
     private final int updateMs = (int) Math.floor(1000 / updateFreq);
 
@@ -24,7 +25,6 @@ public class TreadBot extends OpMode {
 
     private boolean reverse = true;
 
-    private boolean encReset = false;
     private boolean reversePressed = false;
     private boolean climberOpen = false;
     private boolean startPressed = false;
@@ -34,49 +34,23 @@ public class TreadBot extends OpMode {
 
     @Override
     public void init() {
-        left = hardwareMap.dcMotor.get("left");
-        right = hardwareMap.dcMotor.get("right");
-        hangArm = hardwareMap.dcMotor.get("hangArm");
-        plow = hardwareMap.dcMotor.get("plow");
-
-        leftTriggerServo = hardwareMap.servo.get("trigger_left");
-        rightTriggerServo = hardwareMap.servo.get("trigger_right");
-        climberServo = hardwareMap.servo.get("climber");
-
-        left.setDirection(DcMotor.Direction.FORWARD);
-        right.setDirection(DcMotor.Direction.REVERSE);
-        plow.setDirection(DcMotor.Direction.FORWARD);
-        hangArm.setDirection(DcMotor.Direction.REVERSE);
-
-        hangArm.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        plow.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-
-        leftTriggerServo.setPosition(Values.TRIGGER_LEFT_RETRACT);
-        rightTriggerServo.setPosition(Values.TRIGGER_RIGHT_RETRACT);
-        climberServo.setPosition(Values.CLIMBER_CLOSE);
+        robot = new Robot(this);
+        robot.initialize();
+        left = robot.getLeftDriveMotor();
+        right = robot.getRightDriveMotor();
+        hangArm = robot.getHangArmMotor();
+        plow = robot.getPlow();
+        leftTriggerServo = robot.getLeftEyebrow();
+        rightTriggerServo = robot.getRightEyebrow();
+        climberServo = robot.getClimberServo();
     }
 
     @Override
     public void loop() {
-        if (!encReset) {
-            hangArm.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            encReset = true;
-        }
-
-
         // Hours spent: 2
-        right.setPower((reverse) ? -gamepad1.right_stick_y : gamepad1.left_stick_y);
-        left.setPower((reverse) ? -gamepad1.left_stick_y : gamepad1.right_stick_y);
-
+        robot.getRightDriveMotor().setPower((reverse) ? -gamepad1.right_stick_y : gamepad1.left_stick_y);
+        robot.getLeftDriveMotor().setPower((reverse) ? -gamepad1.left_stick_y : gamepad1.right_stick_y);
         telemetry.addData("climberOpen", climberOpen);
-
-        telemetry.addData("rtPos", rightTriggerServo.getPosition());
-        telemetry.addData("ltPos", leftTriggerServo.getPosition());
-        telemetry.addData("left_power", left.getPower());
-        telemetry.addData("right_power", right.getPower());
-        telemetry.addData("hangArmPos", hangArm.getCurrentPosition());
-        telemetry.addData("plowPos", plow.getCurrentPosition());
         telemetry.addData("rightBumper", gamepad1.right_trigger);
         telemetry.addData("reverse", reverse);
         telemetry.addData("joy1Next", nextJoy1);
