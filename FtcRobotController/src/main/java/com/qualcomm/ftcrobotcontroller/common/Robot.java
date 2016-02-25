@@ -1,5 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.common;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
@@ -19,6 +21,7 @@ public class Robot extends Thread {
     private Servo eyebrowLeft;
     private Servo eyebrowRight;
     private Servo climberServo;
+    private Servo frontDeflector;
 
     private GyroSensor gyro;
     private GyroWorkerThread gyroThread;
@@ -48,6 +51,7 @@ public class Robot extends Thread {
         eyebrowLeft = map.servo.get("trigger_left");
         eyebrowRight = map.servo.get("trigger_right");
         climberServo = map.servo.get("climber");
+        frontDeflector = map.servo.get("frontDeflector");
         gyro = map.gyroSensor.get("gyro");
 
         gyroThread = new GyroWorkerThread(parent, gyro);
@@ -71,10 +75,8 @@ public class Robot extends Thread {
         drive_right.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         drive_left.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         // All relative
-        drive_left.setTargetPosition(drive_left.getCurrentPosition() + distance);
-        drive_right.setTargetPosition(drive_right.getCurrentPosition() + distance);
-        leftTarget = drive_left.getTargetPosition();
-        rightTarget = drive_right.getTargetPosition();
+        drive_left.setTargetPosition(leftTarget = drive_left.getCurrentPosition() + distance);
+        drive_right.setTargetPosition(rightTarget = drive_right.getCurrentPosition() + distance);
         drive_left.setPower(power);
         drive_right.setPower(power);
     }
@@ -106,16 +108,15 @@ public class Robot extends Thread {
         drive_right.setPower(power);
     }
 
+
+    public boolean turnComplete(){
+        return Math.abs(gyroThread.heading() - gyroTarget) < 3;
+    }
+
     public boolean movementComplete() {
-        switch (driveMode) {
-            case DRIVE:
-                return Math.abs(leftTarget- drive_left.getCurrentPosition()) < 20 &&
-                        Math.abs(rightTarget - drive_left.getCurrentPosition()) < 20;
-            case TURN:
-                return Math.abs(gyroThread.heading() - gyroTarget) < 3;
-            default:
-                return true;
-        }
+        boolean b = Math.abs(leftTarget - drive_left.getCurrentPosition()) < 20 &&
+                Math.abs(rightTarget - drive_right.getCurrentPosition()) < 20;
+        return b;
     }
 
     public DcMotor getLeftDriveMotor() {
@@ -148,6 +149,10 @@ public class Robot extends Thread {
 
     public Servo getClimberServo() {
         return climberServo;
+    }
+
+    public Servo getFrontDeflector() {
+        return frontDeflector;
     }
 
     public void initialize() {
@@ -228,13 +233,14 @@ public class Robot extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(driveMode != null)
-            parent.telemetry.addData("Mode", driveMode.toString());
-        parent.telemetry.addData("Joystick 1 Left (X,Y): ", parent.gamepad1.left_stick_x+", "+parent.gamepad1.left_stick_y);
-        parent.telemetry.addData("Joystick 1 Right (X,Y): ", parent.gamepad1.right_stick_x+", "+parent.gamepad1.right_stick_y);
-        parent.telemetry.addData("Joystick 2 Left (X,Y): ", parent.gamepad2.left_stick_x+", "+parent.gamepad2.left_stick_y);
-        parent.telemetry.addData("Joystick 2 Right (X,Y): ", parent.gamepad2.right_stick_x+", "+parent.gamepad2.right_stick_y);
-        parent.telemetry.addData("righttarget, lefttarget", leftTarget +","+rightTarget);
+    }
+
+    public void turnClockwise(double pos, double pwr){
+        turn(Math.abs(pos), pwr);
+    }
+
+    public void turnAntiClockwise(double pos, double pwr){
+        turn(-Math.abs(pos), pwr);
     }
 
     @Override
