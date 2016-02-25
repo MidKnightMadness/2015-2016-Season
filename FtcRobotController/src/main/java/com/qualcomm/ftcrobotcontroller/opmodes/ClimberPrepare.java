@@ -4,6 +4,7 @@ import com.qualcomm.ftcrobotcontroller.common.RedBlueOpMode;
 import com.qualcomm.ftcrobotcontroller.common.Robot;
 import com.qualcomm.ftcrobotcontroller.common.StateMachine;
 import com.qualcomm.ftcrobotcontroller.common.Values;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 
 public class ClimberPrepare extends RedBlueOpMode {
 
@@ -13,7 +14,7 @@ public class ClimberPrepare extends RedBlueOpMode {
     @Override
     public void init() {
         robot = new Robot(this);
-        stateMachine = new StateMachine<States>(States.DEPLOY_PLOW, this);
+        stateMachine = new StateMachine<States>(States.DEPLOY_SERVO, this);
         stateMachine.enableDebug();
     }
 
@@ -27,17 +28,16 @@ public class ClimberPrepare extends RedBlueOpMode {
     }
 
     private enum States implements StateMachine.State {
-        DEPLOY_PLOW {
+        DEPLOY_SERVO{
             ClimberPrepare parent;
-
             @Override
             public boolean shouldChangeState() {
-                return Math.abs(Values.PLOW_DEPLOY - parent.robot.getPlow().getCurrentPosition()) < 20;
+                return parent.robot.getFrontDeflector().getPosition() == 0;
             }
 
             @Override
             public void runState() {
-                parent.robot.deployPlow();
+                parent.robot.getFrontDeflector().setPosition(0);
             }
 
             @Override
@@ -50,9 +50,8 @@ public class ClimberPrepare extends RedBlueOpMode {
 
             }
         },
-        DRIVE_BACK {
+        DRIVE_AND_HOPE_FOR_THE_BEST{
             ClimberPrepare parent;
-
             @Override
             public boolean shouldChangeState() {
                 return parent.robot.movementComplete();
@@ -60,8 +59,7 @@ public class ClimberPrepare extends RedBlueOpMode {
 
             @Override
             public void runState() {
-//                parent.robot.driveDistanceTicks(-7000, -1);
-                parent.robot.driveDistanceCm(-60, -1);
+                parent.robot.driveDistanceCm(234, 1);
             }
 
             @Override
@@ -74,20 +72,18 @@ public class ClimberPrepare extends RedBlueOpMode {
 
             }
         },
-        TURN_TOWARDS_GOAL {
+        MAKE_THE_PLOW_GO_DOWN{
             ClimberPrepare parent;
-
             @Override
             public boolean shouldChangeState() {
-                return parent.robot.movementComplete();
+                return Math.abs(parent.robot.getPlow().getCurrentPosition() - Values.PLOW_DEPLOY) < 30;
             }
 
             @Override
             public void runState() {
-                if (parent.teamColor == TeamColor.BLUE)
-                    parent.robot.turn(45, 0.5);
-                else
-                    parent.robot.turn(-45, 0.5);
+                parent.robot.getPlow().setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+                parent.robot.getPlow().setTargetPosition(Values.PLOW_DEPLOY);
+                parent.robot.getPlow().setPower(1);
             }
 
             @Override
@@ -100,16 +96,18 @@ public class ClimberPrepare extends RedBlueOpMode {
 
             }
         },
-        DRIVE_TO_GOAL{
+        PUT_OUT_ARM{
             ClimberPrepare parent;
             @Override
             public boolean shouldChangeState() {
-                return parent.robot.movementComplete();
+                return Values.HANGARM_DEPLOY - parent.robot.getHangArmMotor().getCurrentPosition() < 30;
             }
 
             @Override
             public void runState() {
-//                parent.robot.driveDistanceTicks(-26000, -1);
+                parent.robot.getHangArmMotor().setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+                parent.robot.getHangArmMotor().setTargetPosition(Values.HANGARM_DEPLOY);
+                parent.robot.getHangArmMotor().setPower(1);
             }
 
             @Override
