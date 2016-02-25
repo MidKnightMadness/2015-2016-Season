@@ -5,6 +5,7 @@ import com.qualcomm.ftcrobotcontroller.common.Robot;
 import com.qualcomm.ftcrobotcontroller.common.Values;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -21,7 +22,7 @@ public class TreadBot extends OpMode {
     private DcMotor right;
     private DcMotor hangArm;
     private DcMotor plow;
-    private Servo leftTriggerServo, rightTriggerServo, climberServo;
+    private Servo leftTriggerServo, rightTriggerServo, climberServo, frontDeflector;
 
     private boolean reverse = true;
 
@@ -40,6 +41,7 @@ public class TreadBot extends OpMode {
         right = robot.getRightDriveMotor();
         hangArm = robot.getHangArmMotor();
         plow = robot.getPlow();
+        frontDeflector = robot.getFrontDeflector();
         leftTriggerServo = robot.getLeftEyebrow();
         rightTriggerServo = robot.getRightEyebrow();
         climberServo = robot.getClimberServo();
@@ -60,7 +62,7 @@ public class TreadBot extends OpMode {
         updateDrive();
         updateClimbers();
         updateTrigger();
-
+        updateFrontPlow();
     }
 
     private void updateArm() {
@@ -133,6 +135,15 @@ public class TreadBot extends OpMode {
         }
     }
 
+    private void updateFrontPlow(){
+        if(gamepad2.b){
+            frontDeflector.setPosition(0);
+        }
+        if(gamepad2.y || gamepad1.back){
+            frontDeflector.setPosition(1);
+        }
+    }
+
     private boolean timeExpired(boolean joy1) {
         if (System.currentTimeMillis() > (joy1 ? nextJoy1 : nextJoy2)) {
             if (joy1) {
@@ -184,4 +195,3 @@ public class TreadBot extends OpMode {
                 addServoPos(leftTriggerServo, -servoInc);
     }
 }
-
