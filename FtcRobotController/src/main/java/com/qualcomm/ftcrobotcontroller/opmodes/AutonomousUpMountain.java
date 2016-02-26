@@ -7,6 +7,7 @@ import com.qualcomm.ftcrobotcontroller.common.Values;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class AutonomousUpMountain extends RedBlueLinearOpMode {
 
@@ -14,6 +15,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
     private DcMotor right;
     private DcMotor plow;
     private DcMotor hangArm;
+    private Servo frontDeflector;
     GyroSensor gyroSensor;
     GyroWorkerThread gyro;
     double leftPower;
@@ -25,6 +27,7 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         right = hardwareMap.dcMotor.get("right");
         plow = hardwareMap.dcMotor.get("plow");
         hangArm = hardwareMap.dcMotor.get("hangArm");
+        frontDeflector = hardwareMap.servo.get("frontDeflector");
         right.setDirection(DcMotor.Direction.REVERSE);
         left.setDirection(DcMotor.Direction.FORWARD);
         plow.setDirection(DcMotor.Direction.FORWARD);
@@ -65,20 +68,26 @@ public class AutonomousUpMountain extends RedBlueLinearOpMode {
         plow.setPower(0.5);
 
         sleep(3000);
-        if(teamColor == RedBlueOpMode.TeamColor.BLUE)
+        if(teamColor == RedBlueOpMode.TeamColor.BLUE) {
             turnGyroDistance(-90, -0.2);
-        else if(teamColor == RedBlueOpMode.TeamColor.RED)
+        }
+        else if(teamColor == RedBlueOpMode.TeamColor.RED) {
             turnGyroDistance(90, 0.2);
+        }
 
         stopMotors();
         sleep(1000);
+        frontDeflector.setPosition(1);
 
         telemetry.addData("Gyro", gyro.heading());
 
         if(teamColor == RedBlueOpMode.TeamColor.BLUE) // was 8000
+        {
             driveGyroDistance(14000, 0.3, -90);
-        else if(teamColor == RedBlueOpMode.TeamColor.RED)
+        }
+        else if(teamColor == RedBlueOpMode.TeamColor.RED) {
             driveGyroDistance(14000, 0.3, 90);
+        }
 
         plow.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         plow.setTargetPosition(Values.PLOW_RETRACT); //added this to pull up plow
